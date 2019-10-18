@@ -1,5 +1,3 @@
-import dictionary from './dictionary';
-
 export interface Size {
   width: number;
   height: number;
@@ -30,23 +28,14 @@ function destroyElement(node: HTMLElement, element: HTMLElement): void {
   }
 }
 
-const cache = dictionary<Size>();
-
 export default function calculateSize(node: HTMLElement, text: string): Size {
-  if (cache.has(text)) {
-    return cache.get(text);
-  }
-
   const element = createDummyElement(node, text);
-
   const size = {
     width: element.scrollWidth,
     height: element.offsetHeight,
   }
 
   destroyElement(node, element);
-
-  cache[text] = size;
 
   return size;
 }

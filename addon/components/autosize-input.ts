@@ -1,4 +1,4 @@
-import { action } from '@ember/object';
+import { action, computed } from '@ember/object';
 import { htmlSafe } from '@ember/string';
 import { SafeString } from '@glimmer/runtime';
 import { tracked } from '@glimmer/tracking';
@@ -12,27 +12,24 @@ interface AutosizeInputArgs {
 
 export default class AutosizeInput extends Component<AutosizeInputArgs> {
   @tracked public value: string = this.args.value;
-  @tracked public style: SafeString = htmlSafe('');
 
-  parentRef?: HTMLElement;
   inputRef?: HTMLInputElement;
+
+  @computed('value')
+  get style(): SafeString {
+    if (this.inputRef && this.inputRef.parentElement) {
+      const { width } = calculateSize(this.inputRef.parentElement, this.value);
+
+      return htmlSafe(`width: ${width + 2}px`);
+    } else {
+      return htmlSafe(`width: ${(this.args.minWidth || 0) + 2}px`);
+    }
+  }
 
   @action
   onInput(event: InputEvent) {
     if (this.inputRef && event.target) {
-      const target = (event.target as HTMLInputElement);
-      const value = target.value || '';
-
-      if (!this.parentRef && target.parentElement) {
-        this.parentRef = target.parentElement;
-      }
-
-      if (this.parentRef) {
-        const { width } = calculateSize(this.parentRef, value);
-        this.style = htmlSafe(`width: ${width + 2}px`);
-      }
-
-      this.value = value;
+      this.value = (event.target as HTMLInputElement).value || '';
     }
   }
 }
