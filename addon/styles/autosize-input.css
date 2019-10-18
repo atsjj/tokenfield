@@ -4,7 +4,7 @@
 
 .autosize-input > input {
   background: 0px center;
-  border: 1px solid black;
+  border: 0;
   box-sizing: content-box;
   color: inherit;
   font-size: inherit;

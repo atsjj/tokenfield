@@ -1,3 +1,6 @@
-<div class="tf-value-container" ...attributes>
+<div class="tf-value-container"
+     ...attributes
+     {{on "dblclick" this.onDblClick}}
+     {{on "mouseup" this.onMouseDown}}>
   {{yield}}
 </div>

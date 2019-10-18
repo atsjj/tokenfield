@@ -1,0 +1,29 @@
+@keyframes tf-animation-loading-dot {
+  0%, 80%, 100% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.tf-loading-dot {
+  background-color: currentcolor;
+  border-radius: 1em;
+  display: inline-block;
+  height: 1em;
+  vertical-align: top;
+  width: 1em;
+}
+
+.tf-loading-dot:nth-child(1) {
+  animation: 1s ease-in-out 0ms infinite normal none running tf-animation-loading-dot;
+}
+
+.tf-loading-dot:nth-child(2) {
+  animation: 1s ease-in-out 160ms infinite normal none running tf-animation-loading-dot;
+}
+
+.tf-loading-dot:nth-child(3) {
+  animation: 1s ease-in-out 320ms infinite normal none running tf-animation-loading-dot;
+}

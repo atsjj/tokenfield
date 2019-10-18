@@ -1,41 +1,57 @@
-<TfSelect>
-  <TfSelectContainer>
-    <TfControl>
-      <TfMultiValueContainer>
-        <TfMultiValue>
-          <TfMultiValueLabel>Orange</TfMultiValueLabel>
-          <TfMultiValueRemove>
-            <TfCrossIcon @size={{14}} />
-          </TfMultiValueRemove>
-        </TfMultiValue>
-        <TfMultiValue>
-          <TfMultiValueLabel>Yellow</TfMultiValueLabel>
-          <TfMultiValueRemove>
-            <TfCrossIcon @size={{14}} />
-          </TfMultiValueRemove>
-        </TfMultiValue>
-        <TfInput>
-          <AutosizeInput />
-        </TfInput>
-      </TfMultiValueContainer>
-      <TfIndicatorsContainer>
-        <TfClearIndicator>
-          <TfCrossIcon />
-        </TfClearIndicator>
-        <TfIndicatorSeparator />
-        <TfDropdownIndicator>
-          <TfDownChevron />
-        </TfDropdownIndicator>
-      </TfIndicatorsContainer>
-    </TfControl>
-    <TfMenu>
-      <TfMenuList>
-        <TfOption>Ocean</TfOption>
-        <TfOption>Blue</TfOption>
-        <TfOption>Purple</TfOption>
-        <TfOption>Red</TfOption>
-        <TfOption>Green</TfOption>
-      </TfMenuList>
-    </TfMenu>
-  </TfSelectContainer>
-</TfSelect>
+<TfStateManager as |state|>
+  <TfSelect>
+    <TfSelectContainer>
+      <TfControl>
+        <TfMultiValueContainer>
+          <TfMultiValue>
+            <TfMultiValueLabel>{{state.value}}</TfMultiValueLabel>
+            <TfMultiValueRemove>
+              <TfCrossIcon @size={{14}} />
+            </TfMultiValueRemove>
+          </TfMultiValue>
+          <TfMultiValue>
+            <TfMultiValueLabel>Yellow</TfMultiValueLabel>
+            <TfMultiValueRemove>
+              <TfCrossIcon @size={{14}} />
+            </TfMultiValueRemove>
+          </TfMultiValue>
+          <TfInput>
+            <AutosizeInput @onInput={{action (mut state.value)}}
+                           @onKeyUp={{fn state.onKeyUp}}
+                           @placeholder={{state.placeholder}}
+                           @value={{state.value}} />
+          </TfInput>
+        </TfMultiValueContainer>
+        <TfIndicatorsContainer>
+          {{#if state.isValuePresent}}
+            <TfClearIndicator @onClick={{action (mut state.value)}}>
+              <TfCrossIcon />
+            </TfClearIndicator>
+          {{/if}}
+          {{#if state.isLoading}}
+            <TfLoadingIndicator>
+              <TfLoadingDot />
+              <TfLoadingDot />
+              <TfLoadingDot />
+            </TfLoadingIndicator>
+          {{/if}}
+          <TfIndicatorSeparator />
+          <TfDropdownIndicator>
+            <TfDownChevron />
+          </TfDropdownIndicator>
+        </TfIndicatorsContainer>
+      </TfControl>
+      {{#if state.menuIsOpen}}
+        <TfMenu>
+          <TfMenuList>
+            <TfOption>Ocean</TfOption>
+            <TfOption>Blue</TfOption>
+            <TfOption>Purple</TfOption>
+            <TfOption>Red</TfOption>
+            <TfOption>Green</TfOption>
+          </TfMenuList>
+        </TfMenu>
+      {{/if}}
+    </TfSelectContainer>
+  </TfSelect>
+</TfStateManager>

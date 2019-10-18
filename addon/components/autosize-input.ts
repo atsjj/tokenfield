@@ -1,34 +1,50 @@
 import { action, computed } from '@ember/object';
 import { htmlSafe } from '@ember/string';
 import { SafeString } from '@glimmer/runtime';
-import { tracked } from '@glimmer/tracking';
 import calculateSize from '../-private/calculate-size';
 import Component from '@glimmer/component';
 
 interface AutosizeInputArgs {
   minWidth?: number;
-  value: string;
+  onInput?: (value: string, event: InputEvent) => Promise<void> | void;
+  onKeyUp?: (event: InputEvent) => Promise<void> | void;
+  value?: string;
 }
 
 export default class AutosizeInput extends Component<AutosizeInputArgs> {
-  @tracked private value: string = this.args.value;
   private inputRef?: HTMLInputElement;
 
-  @computed('value')
-  get style(): SafeString {
-    if (this.inputRef && this.inputRef.parentElement) {
-      const { width } = calculateSize(this.inputRef.parentElement, this.value);
+  get value(): string {
+    return (this.args && this.args.value) ? this.args.value : '';
+  }
 
-      return htmlSafe(`width: ${width + 2}px`);
-    } else {
-      return htmlSafe(`width: ${(this.args.minWidth || 0) + 2}px`);
-    }
+  get minWidth(): number {
+    return (this.args && this.args.minWidth) ? this.args.minWidth : 0;
+  }
+
+  @computed('args.minWidth', 'args.value')
+  get style(): SafeString {
+    const width = ((this.inputRef && this.inputRef.parentElement) ?
+      calculateSize(this.inputRef.parentElement, this.value).width : this.minWidth) + 2;
+
+    return htmlSafe(`width: ${width}px`);
   }
 
   @action
   onInput(event: InputEvent) {
-    if (this.inputRef && event.target) {
-      this.value = (event.target as HTMLInputElement).value || '';
+    // console.info('AutosizeInput', 'onInput', ...arguments);
+
+    if (this.inputRef && event.target && this.args.onInput) {
+      this.args.onInput(((event.target as HTMLInputElement).value || ''), event);
+    }
+  }
+
+  @action
+  onKeyUp(event: InputEvent) {
+    // console.info('AutosizeInput', 'onKeyUp', ...arguments);
+
+    if (this.args.onKeyUp) {
+      this.args.onKeyUp(event);
     }
   }
 }
