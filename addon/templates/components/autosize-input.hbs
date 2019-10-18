@@ -8,7 +8,10 @@
          tabindex="0"
          type="text"
          value={{@value}}
+         {{on "blur" this.onBlur}}
+         {{on "focus" this.onFocus}}
          {{on "input" this.onInput}}
+         {{on "keydown" this.onKeyDown}}
          {{on "keyup" this.onKeyUp}}
          {{ref this "inputRef"}}>
 </div>

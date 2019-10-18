@@ -3,7 +3,7 @@
   -webkit-box-pack: justify;
   align-items: center;
   background-color: rgb(255, 255, 255);
-  border-color: rgb(204, 204, 204);
+  border-color: var(--neutral-20);
   border-radius: 4px;
   border-style: solid;
   border-width: 1px;
@@ -16,4 +16,12 @@
   outline: 0px !important;
   position: relative;
   transition: all 100ms ease 0s;
+}
+
+.tf-control-disabled {
+  border-color: var(--neutral-10);
+}
+
+.tf-control-focused {
+  border-color: var(--primary);
 }

@@ -1,23 +1,23 @@
 <TfStateManager as |state|>
   <TfSelect>
     <TfSelectContainer>
-      <TfControl>
-        <TfMultiValueContainer>
-          <TfMultiValue>
-            <TfMultiValueLabel>{{state.value}}</TfMultiValueLabel>
-            <TfMultiValueRemove>
-              <TfCrossIcon @size={{14}} />
-            </TfMultiValueRemove>
-          </TfMultiValue>
-          <TfMultiValue>
-            <TfMultiValueLabel>Yellow</TfMultiValueLabel>
-            <TfMultiValueRemove>
-              <TfCrossIcon @size={{14}} />
-            </TfMultiValueRemove>
-          </TfMultiValue>
+      <TfControl class={{state.classesForTfControl}}>
+        <TfMultiValueContainer @onMouseDown={{fn state.onInputMouseDown}}
+                               @onDblClick={{fn state.onDblClick}}>
+          {{#each state.selectedOptions as |option|}}
+            <TfMultiValue @value={{option.value}}>
+              <TfMultiValueLabel>{{option.label}}</TfMultiValueLabel>
+              <TfMultiValueRemove>
+                <TfCrossIcon @size={{14}} />
+              </TfMultiValueRemove>
+            </TfMultiValue>
+          {{/each}}
           <TfInput>
-            <AutosizeInput @onInput={{action (mut state.value)}}
-                           @onKeyUp={{fn state.onKeyUp}}
+            <AutosizeInput @onBlur={{fn state.onInputBlur}}
+                           @onFocus={{fn state.onInputFocus}}
+                           @onInput={{action (mut state.value)}}
+                           @onKeyDown={{fn state.onInputKeyDown}}
+                           @onKeyUp={{fn state.onInputKeyUp}}
                            @placeholder={{state.placeholder}}
                            @value={{state.value}} />
           </TfInput>
@@ -41,14 +41,12 @@
           </TfDropdownIndicator>
         </TfIndicatorsContainer>
       </TfControl>
-      {{#if state.menuIsOpen}}
+      {{#if state.isMenuOpen}}
         <TfMenu>
           <TfMenuList>
-            <TfOption>Ocean</TfOption>
-            <TfOption>Blue</TfOption>
-            <TfOption>Purple</TfOption>
-            <TfOption>Red</TfOption>
-            <TfOption>Green</TfOption>
+            {{#each state.options as |option|}}
+              <TfOption @value={{option.value}}>{{option.label}}</TfOption>
+            {{/each}}
           </TfMenuList>
         </TfMenu>
       {{/if}}

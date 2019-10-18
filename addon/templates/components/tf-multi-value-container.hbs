@@ -1,3 +1,5 @@
-<TfValueContainer class="tf-multi-value-container">
+<TfValueContainer @onMouseDown={{@onMouseDown}}
+                  @onDblClick={{@onDblClick}}
+                  class="tf-multi-value-container">
   {{yield}}
 </TfValueContainer>

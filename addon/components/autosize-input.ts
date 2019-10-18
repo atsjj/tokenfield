@@ -6,7 +6,10 @@ import Component from '@glimmer/component';
 
 interface AutosizeInputArgs {
   minWidth?: number;
+  onBlur?: (event: InputEvent) => Promise<void> | void;
+  onFocus?: (event: InputEvent) => Promise<void> | void;
   onInput?: (value: string, event: InputEvent) => Promise<void> | void;
+  onKeyDown?: (event: InputEvent) => Promise<void> | void;
   onKeyUp?: (event: InputEvent) => Promise<void> | void;
   value?: string;
 }
@@ -30,8 +33,23 @@ export default class AutosizeInput extends Component<AutosizeInputArgs> {
     return htmlSafe(`width: ${width}px`);
   }
 
-  @action
-  onInput(event: InputEvent) {
+  @action onBlur(event: InputEvent) {
+    // console.info('AutosizeInput', 'onBlur', ...arguments);
+
+    if (this.args.onBlur) {
+      this.args.onBlur(event);
+    }
+  }
+
+  @action onFocus(event: InputEvent) {
+    // console.info('AutosizeInput', 'onFocus', ...arguments);
+
+    if (this.args.onFocus) {
+      this.args.onFocus(event);
+    }
+  }
+
+  @action onInput(event: InputEvent) {
     // console.info('AutosizeInput', 'onInput', ...arguments);
 
     if (this.inputRef && event.target && this.args.onInput) {
@@ -39,8 +57,15 @@ export default class AutosizeInput extends Component<AutosizeInputArgs> {
     }
   }
 
-  @action
-  onKeyUp(event: InputEvent) {
+  @action onKeyDown(event: InputEvent) {
+    // console.info('AutosizeInput', 'onKeyDown', ...arguments);
+
+    if (this.args.onKeyDown) {
+      this.args.onKeyDown(event);
+    }
+  }
+
+  @action onKeyUp(event: InputEvent) {
     // console.info('AutosizeInput', 'onKeyUp', ...arguments);
 
     if (this.args.onKeyUp) {

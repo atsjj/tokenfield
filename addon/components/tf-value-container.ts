@@ -1,26 +1,21 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 
-export default class TfValueContainer extends Component {
-  @action
-  onMouseDown(event: MouseEvent) {
-    if (event.target) {
-      const input = (event.target as HTMLElement).querySelector('input');
+interface TfValueContainerArgs {
+  onMouseDown?: (event: MouseEvent) => Promise<void> | void;
+  onDblClick?: (event: MouseEvent) => Promise<void> | void;
+}
 
-      if (input) {
-        (input as HTMLInputElement).focus();
-      }
+export default class TfValueContainer extends Component<TfValueContainerArgs> {
+  @action onMouseDown(event: MouseEvent) {
+    if (this.args.onMouseDown) {
+      this.args.onMouseDown(event);
     }
   }
 
-  @action
-  onDblClick(event: MouseEvent) {
-    if (event.target) {
-      const input = (event.target as HTMLElement).querySelector('input');
-
-      if (input) {
-        (input as HTMLInputElement).select();
-      }
+  @action onDblClick(event: MouseEvent) {
+    if (this.args.onDblClick) {
+      this.args.onDblClick(event);
     }
   }
 }
