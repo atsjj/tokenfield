@@ -1,5 +1,5 @@
 {
-  "name": "@atsjj/pick",
+  "name": "@atsjj/tokenfield",
   "version": "1.0.0-alpha.1",
   "description": "Based on React Select, a flexible and beautiful Select Input control for Ember with multiselect, autocomplete, async and creatable support.",
   "keywords": [
@@ -8,6 +8,7 @@
   "repository": "",
   "license": "MIT",
   "author": "Steve Jabour <steve@jabour.me> (https://github.com/atsjj)",
+  "private": true,
   "directories": {
     "doc": "doc",
     "test": "tests"
