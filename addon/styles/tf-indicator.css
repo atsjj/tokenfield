@@ -1,0 +1,19 @@
+.tf-indicator {
+  box-sizing: border-box;
+  color: var(--neutral-20);
+  display: flex;
+  padding: calc(var(--base-unit) * 2);
+  transition: color 150ms ease 0s;
+}
+
+.tf-indicator:focus {
+  color: var(--neutral-60);
+}
+
+.tf-indicator:hover {
+  color: var(--neutral-40);
+}
+
+.tf-indicator:focus:hover {
+  color: var(--neutral-80);
+}

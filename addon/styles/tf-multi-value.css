@@ -1,0 +1,8 @@
+.tf-multi-value {
+  background-color: rgb(230, 230, 230);
+  display: flex;
+  min-width: 0px;
+  box-sizing: border-box;
+  border-radius: 2px;
+  margin: 2px;
+}

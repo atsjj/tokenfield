@@ -1,0 +1,8 @@
+.tf-indicators-container {
+  -webkit-box-align: center;
+  align-items: center;
+  align-self: stretch;
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+}

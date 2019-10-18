@@ -1,0 +1,8 @@
+.tf-menu-list {
+  box-sizing: border-box;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-bottom: 4px;
+  padding-top: 4px;
+  position: relative;
+}

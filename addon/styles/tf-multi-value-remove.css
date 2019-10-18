@@ -1,0 +1,9 @@
+.tf-multi-value-remove {
+  -webkit-box-align: center;
+  align-items: center;
+  display: flex;
+  padding-left: 4px;
+  padding-right: 4px;
+  box-sizing: border-box;
+  border-radius: 2px;
+}

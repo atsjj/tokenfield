@@ -1,0 +1,31 @@
+.autosize-input {
+  display: inline-block;
+}
+
+.autosize-input > input {
+  background: 0px center;
+  border: 1px solid black;
+  box-sizing: content-box;
+  color: inherit;
+  font-size: inherit;
+  opacity: 1;
+  outline: 0px;
+  padding: 0px;
+  width: 2px;
+}
+
+.autosize-input > div {
+  font-family: system-ui;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  height: 0px;
+  left: 0px;
+  letter-spacing: normal;
+  overflow: scroll;
+  position: absolute;
+  text-transform: none;
+  top: 0px;
+  visibility: hidden;
+  white-space: pre;
+}

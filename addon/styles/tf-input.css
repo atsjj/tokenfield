@@ -1,0 +1,8 @@
+.tf-input {
+  box-sizing: border-box;
+  color: rgb(51, 51, 51);
+  margin: 2px;
+  padding-bottom: 2px;
+  padding-top: 2px;
+  visibility: visible;
+}

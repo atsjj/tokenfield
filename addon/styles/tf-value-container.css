@@ -1,0 +1,11 @@
+.tf-value-container {
+  -webkit-box-align: center;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  box-sizing: border-box;
+  flex: 1 1 0%;
+  padding: calc(var(--base-unit) / 2) calc(var(--base-unit) * 2);
+  overflow: hidden;
+}
