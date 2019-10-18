@@ -11,9 +11,8 @@ interface AutosizeInputArgs {
 }
 
 export default class AutosizeInput extends Component<AutosizeInputArgs> {
-  @tracked public value: string = this.args.value;
-
-  inputRef?: HTMLInputElement;
+  @tracked private value: string = this.args.value;
+  private inputRef?: HTMLInputElement;
 
   @computed('value')
   get style(): SafeString {
