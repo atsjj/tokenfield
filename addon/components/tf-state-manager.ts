@@ -68,15 +68,17 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action popOption(): Option | undefined {
-    const value = this.selectedOptions.slice(-1).shift();
+    const value = this.selectedOptions.pop();
 
-    this.selectedOptions = this.selectedOptions.slice(0, -1);
+    this.selectedOptions = this.selectedOptions;
 
     return value;
   }
 
   @action pushOption(...value: Option[]) {
-    this.selectedOptions = this.selectedOptions.concat(value);
+    this.selectedOptions.push(...value);
+
+    this.selectedOptions = this.selectedOptions;
   }
 
   /**
