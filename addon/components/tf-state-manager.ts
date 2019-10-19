@@ -105,20 +105,9 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
    * @param event
    */
   @action onInputKeyUp(event: KeyboardEvent) {
-    // console.info('TfStateManager', 'onInputKeyUp', event);
     const inputElement = (event.target as HTMLInputElement);
-    // const value = (inputElement) ? inputElement.value : '';
-
-    // this.value = value;
 
     switch (event.key) {
-      case 'Backspace': {
-        if (this.lastValueLength <= 0) {
-          this.popOption();
-        }
-
-        break;
-      }
       case 'Escape': {
         if (inputElement) {
           inputElement.blur();
@@ -138,11 +127,16 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
    * @param event
    */
   @action onInputKeyDown(event: KeyboardEvent) {
-    // console.info('TfStateManager', 'onInputKeyDown', event);
     this.lastValueLength = this.value.length;
-    // const inputElement = (event.target as HTMLInputElement);
 
     switch (event.key) {
+      case 'Backspace': {
+        if (this.lastValueLength <= 0) {
+          this.popOption();
+        }
+
+        break;
+      }
       case 'Tab': {
         event.preventDefault();
         break;
