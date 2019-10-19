@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/components/tf-loading-message';
+export { default } from '@atsjj/tokenfield/components/tf-loading-message';

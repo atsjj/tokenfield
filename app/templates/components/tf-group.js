@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/templates/components/tf-group';
+export { default } from '@atsjj/tokenfield/templates/components/tf-group';

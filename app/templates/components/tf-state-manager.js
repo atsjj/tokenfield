@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/templates/components/tf-state-manager';
+export { default } from '@atsjj/tokenfield/templates/components/tf-state-manager';

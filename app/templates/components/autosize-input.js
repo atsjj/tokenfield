@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/templates/components/autosize-input';
+export { default } from '@atsjj/tokenfield/templates/components/autosize-input';

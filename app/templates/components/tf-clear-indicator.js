@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/templates/components/tf-clear-indicator';
+export { default } from '@atsjj/tokenfield/templates/components/tf-clear-indicator';

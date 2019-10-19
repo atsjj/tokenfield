@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/templates/components/tf-indicator-separator';
+export { default } from '@atsjj/tokenfield/templates/components/tf-indicator-separator';

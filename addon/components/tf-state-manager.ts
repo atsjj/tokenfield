@@ -45,6 +45,14 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @tracked private defaultOptions: Option[] = defaultOptions;
   @tracked private loadedOptions: Option[] = [];
   @tracked private selectedOptions: Option[] = selectedOptions;
+  private lastValueLength: number = (this.args.value || '').length;
+
+  debug() {
+    this.isMenuOpen;
+    this.placeholder;
+    this.isLoading;
+    this.loadedOptions;
+  }
 
   get classesForTfControl(): string {
     if (this.isFocused) {
@@ -99,10 +107,13 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @action onInputKeyUp(event: KeyboardEvent) {
     // console.info('TfStateManager', 'onInputKeyUp', event);
     const inputElement = (event.target as HTMLInputElement);
+    // const value = (inputElement) ? inputElement.value : '';
+
+    // this.value = value;
 
     switch (event.key) {
       case 'Backspace': {
-        if (!this.isValuePresent) {
+        if (this.lastValueLength <= 0) {
           this.popOption();
         }
 
@@ -127,7 +138,8 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
    * @param event
    */
   @action onInputKeyDown(event: KeyboardEvent) {
-    console.info('TfStateManager', 'onInputKeyDown', event);
+    // console.info('TfStateManager', 'onInputKeyDown', event);
+    this.lastValueLength = this.value.length;
     // const inputElement = (event.target as HTMLInputElement);
 
     switch (event.key) {

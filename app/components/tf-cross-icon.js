@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/components/tf-cross-icon';
+export { default } from '@atsjj/tokenfield/components/tf-cross-icon';

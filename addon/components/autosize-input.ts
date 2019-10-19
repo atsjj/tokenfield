@@ -1,7 +1,4 @@
-import { action, computed } from '@ember/object';
-import { htmlSafe } from '@ember/string';
-import { SafeString } from '@glimmer/runtime';
-import calculateSize from '../-private/calculate-size';
+import { action } from '@ember/object';
 import Component from '@glimmer/component';
 
 interface AutosizeInputArgs {
@@ -16,22 +13,6 @@ interface AutosizeInputArgs {
 
 export default class AutosizeInput extends Component<AutosizeInputArgs> {
   private inputRef?: HTMLInputElement;
-
-  get value(): string {
-    return (this.args && this.args.value) ? this.args.value : '';
-  }
-
-  get minWidth(): number {
-    return (this.args && this.args.minWidth) ? this.args.minWidth : 0;
-  }
-
-  @computed('args.minWidth', 'args.value')
-  get style(): SafeString {
-    const width = ((this.inputRef && this.inputRef.parentElement) ?
-      calculateSize(this.inputRef.parentElement, this.value).width : this.minWidth) + 2;
-
-    return htmlSafe(`width: ${width}px`);
-  }
 
   @action onBlur(event: InputEvent) {
     // console.info('AutosizeInput', 'onBlur', ...arguments);

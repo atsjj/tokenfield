@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/components/tf-placeholder';
+export { default } from '@atsjj/tokenfield/components/tf-placeholder';

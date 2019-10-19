@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/components/tf-single-value';
+export { default } from '@atsjj/tokenfield/components/tf-single-value';

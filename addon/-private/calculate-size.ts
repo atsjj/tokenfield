@@ -16,6 +16,12 @@ function createDummyElement(node: HTMLElement, text: string): HTMLElement {
   element.style.height = '0';
   element.style.overflow = 'scroll';
   element.style.whiteSpace = 'pre';
+  element.style.fontSize = node.style.fontSize;
+  element.style.fontFamily = node.style.fontFamily;
+  element.style.fontWeight = node.style.fontWeight;
+  element.style.fontStyle = node.style.fontStyle;
+  element.style.letterSpacing = node.style.letterSpacing;
+  element.style.textTransform = node.style.textTransform;
 
   node.appendChild(element);
 

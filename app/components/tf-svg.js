@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/components/tf-svg';
+export { default } from '@atsjj/tokenfield/components/tf-svg';

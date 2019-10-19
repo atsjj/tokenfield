@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/templates/components/tf-input';
+export { default } from '@atsjj/tokenfield/templates/components/tf-input';

@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/components/tf-no-options-message';
+export { default } from '@atsjj/tokenfield/components/tf-no-options-message';

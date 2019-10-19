@@ -1,1 +1,1 @@
-export { default } from '@atsjj/pick/templates/components/tf-dropdown-indicator';
+export { default } from '@atsjj/tokenfield/templates/components/tf-dropdown-indicator';

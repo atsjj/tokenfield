@@ -29,16 +29,16 @@
         "tests/dummy/app/*",
         "app/*"
       ],
-      "@atsjj/pick": [
+      "@atsjj/tokenfield": [
         "addon"
       ],
-      "@atsjj/pick/*": [
+      "@atsjj/tokenfield/*": [
         "addon/*"
       ],
-      "@atsjj/pick/test-support": [
+      "@atsjj/tokenfield/test-support": [
         "addon-test-support"
       ],
-      "@atsjj/pick/test-support/*": [
+      "@atsjj/tokenfield/test-support/*": [
         "addon-test-support/*"
       ],
       "*": [
