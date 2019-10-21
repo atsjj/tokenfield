@@ -1,6 +1,6 @@
 .tf-option {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  background-color: rgb(222, 235, 255);
+  background-color: transparent;
   box-sizing: border-box;
   color: inherit;
   cursor: default;
@@ -9,4 +9,22 @@
   padding: 8px 12px;
   user-select: none;
   width: 100%;
+}
+
+.tf-option:hover {
+  background-color: var(--primary25);
+}
+
+.tf-option:active {
+  background-color: var(--primary50);
+}
+
+.tf-option.disabled {
+  background-color: transparent;
+  color: var(--neutral20);
+}
+
+.tf-option.selected {
+  background-color: var(--primary);
+  color: var(--neutral0);
 }

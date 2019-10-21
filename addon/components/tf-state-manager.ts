@@ -1,6 +1,7 @@
-import { action } from '@ember/object';
+import { action, computed } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
+import { isEqual } from '@ember/utils';
 
 interface TfStateManagerArgs {
   onInput?: Function;
@@ -8,7 +9,7 @@ interface TfStateManagerArgs {
   placeholder?: string;
 }
 
-interface Option {
+export interface Option {
   value: string,
   label: string,
   [key: string]: any
@@ -16,12 +17,32 @@ interface Option {
 
 const defaultOptions: Option[] = [
   {
-    label: 'Orange',
-    value: 'orange',
+    label: 'Red',
+    value: 'red',
+  },
+  {
+    label: 'Green',
+    value: 'green',
+  },
+  {
+    label: 'Blue',
+    value: 'blue',
+  },
+  {
+    label: 'Cyan',
+    value: 'cyan',
+  },
+  {
+    label: 'Magenta',
+    value: 'magenta',
   },
   {
     label: 'Yellow',
     value: 'yellow',
+  },
+  {
+    label: 'Black',
+    value: 'black',
   },
 ];
 
@@ -29,29 +50,29 @@ const selectedOptions: Option[] = [
   {
     label: 'Orange',
     value: 'orange',
-  },
-  {
-    label: 'Yellow',
-    value: 'yellow',
-  },
+  }
 ];
 
 export default class TfStateManager extends Component<TfStateManagerArgs> {
+  @tracked private isMulti: boolean = true;
   @tracked private isFocused: boolean = false;
   @tracked private isMenuOpen: boolean = false;
   @tracked private placeholder: string = this.args.placeholder || '';
   @tracked private value: string = this.args.value || '';
   @tracked private isLoading: boolean = false;
-  @tracked private defaultOptions: Option[] = defaultOptions;
-  @tracked private loadedOptions: Option[] = [];
+  @tracked private selectedOption: Option | undefined;
   @tracked private selectedOptions: Option[] = selectedOptions;
+  @tracked private options: Option[] = defaultOptions;
+
+  private element: HTMLDivElement | undefined;
   private lastValueLength: number = (this.args.value || '').length;
 
   debug() {
     this.isMenuOpen;
     this.placeholder;
     this.isLoading;
-    this.loadedOptions;
+    this.isMulti;
+    this.selectedOption;
   }
 
   get classesForTfControl(): string {
@@ -62,13 +83,9 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     }
   }
 
-  get options(): Option[] {
-    // if (this.isValuePresent) {
-    //   return this.loadedOptions;
-    // } else {
-    //   return this.defaultOptions;
-    // }
-    return this.defaultOptions;
+  @computed('options', 'selectedOptions')
+  get innerOptions(): Option[] {
+    return this.options.filter(option => !this.selectedOptions.some(selectedOption => isEqual(selectedOption, option)));
   }
 
   get isValuePresent() {
@@ -181,5 +198,38 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
         (input as HTMLInputElement).select();
       }
     }
+  }
+
+  @action onOptionClick(_: MouseEvent, option: Option) {
+    // console.info('TfStateManager', 'onOptionClick', ...arguments);
+
+    if (this.isMulti) {
+      this.selectedOptions.push(option);
+      this.selectedOptions = this.selectedOptions;
+    } else {
+      this.selectedOption = option;
+    }
+  }
+
+  onBlur(event: MouseEvent) {
+    if (this.element && event.target) {
+      if (!this.element.contains(event.target as HTMLElement)) {
+        this.isFocused = false;
+        this.isMenuOpen = false;
+        this.value = '';
+      }
+    }
+  }
+
+  @action onInsert(element: HTMLDivElement) {
+    this.element = element;
+
+    document.addEventListener('click', this.onBlur.bind(this));
+  }
+
+  @action onDestroy() {
+    this.element = undefined;
+
+    document.removeEventListener('click', this.onBlur.bind(this));
   }
 }
