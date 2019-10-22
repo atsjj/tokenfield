@@ -3,8 +3,9 @@ import Component from '@glimmer/component';
 
 interface AutosizeInputArgs {
   minWidth?: number;
-  onBlur?: (event: InputEvent) => Promise<void> | void;
-  onFocus?: (event: InputEvent) => Promise<void> | void;
+  onBlur?: (event: FocusEvent) => Promise<void> | void;
+  onClick?: (event: MouseEvent) => Promise<void> | void;
+  onFocus?: (event: FocusEvent) => Promise<void> | void;
   onInput?: (value: string, event: InputEvent) => Promise<void> | void;
   onKeyDown?: (event: InputEvent) => Promise<void> | void;
   onKeyUp?: (event: InputEvent) => Promise<void> | void;
@@ -14,7 +15,7 @@ interface AutosizeInputArgs {
 export default class AutosizeInput extends Component<AutosizeInputArgs> {
   private inputRef?: HTMLInputElement;
 
-  @action onBlur(event: InputEvent) {
+  @action onBlur(event: FocusEvent) {
     // console.info('AutosizeInput', 'onBlur', ...arguments);
 
     if (this.args.onBlur) {
@@ -22,7 +23,15 @@ export default class AutosizeInput extends Component<AutosizeInputArgs> {
     }
   }
 
-  @action onFocus(event: InputEvent) {
+  @action onClick(event: MouseEvent) {
+    // console.info('AutosizeInput', 'onClick', ...arguments);
+
+    if (this.args.onClick) {
+      this.args.onClick(event);
+    }
+  }
+
+  @action onFocus(event: FocusEvent) {
     // console.info('AutosizeInput', 'onFocus', ...arguments);
 
     if (this.args.onFocus) {

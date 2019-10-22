@@ -100,6 +100,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action openMenu() {
+    console.info('TfStateManager', 'openMenu');
     if (!this.isMenuOpen) {
       this.hoveredOption = this.innerOptions[0];
       this.isFocused = true;
@@ -108,11 +109,13 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action nextMenuOption() {
+    const isMenuOpen = this.isMenuOpen;
     const min = 0;
 
     this.openMenu();
 
-    if (this.hoveredOption) {
+
+    if (this.hoveredOption && isMenuOpen) {
       let index = this.innerOptions.findIndex(option => isEqual(option, this.hoveredOption)) + 1;
 
       if (index >= this.innerOptions.length) {
@@ -126,11 +129,12 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action prevMenuOption() {
+    const isMenuOpen = this.isMenuOpen;
     const max = this.innerOptions.length - 1;
 
     this.openMenu();
 
-    if (this.hoveredOption) {
+    if (this.hoveredOption && isMenuOpen) {
       let index = this.innerOptions.findIndex(option => isEqual(option, this.hoveredOption)) - 1;
 
       if (index < 0) {
@@ -146,14 +150,17 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @action closeMenu(shouldBlur?: boolean) {
     if (this.isMenuOpen) {
       this.hoveredOption = undefined;
-      this.isFocused = false;
       this.isMenuOpen = false;
       this.value = '';
+    }
 
-      if (shouldBlur && this.containerElement) {
-        if (document.activeElement && this.containerElement.contains(document.activeElement)) {
-          (document.activeElement as HTMLElement).blur();
-        }
+    if (shouldBlur && this.containerElement) {
+      if (document.activeElement && this.containerElement.contains(document.activeElement)) {
+        console.info('TfStateManager', 'closeMenu', 'fully blur');
+        (document.activeElement as HTMLElement).blur();
+        this.isFocused = false;
+      } else {
+        console.info('TfStateManager', 'closeMenu', 'partially blur');
       }
     }
   }
@@ -211,7 +218,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
    * Focus Event Handler for Input
    */
   @action onInputFocus() {
-    this.openMenu();
+    this.isFocused = true;
   }
 
   /**
@@ -272,7 +279,13 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
    * Blur Event Handler for Input
    */
   @action onInputBlur() {
-    this.closeMenu();
+    console.info('TfStateManager', 'onInputBlur', ...arguments);
+
+    if (this.containerElement) {
+      if (!document.activeElement && this.containerElement.contains(document.activeElement)) {
+        this.closeMenu(true);
+      }
+    }
   }
 
   /**
@@ -325,6 +338,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   onBlur(event: MouseEvent) {
     if (this.containerElement && event.target) {
       if (!this.containerElement.contains(event.target as HTMLElement)) {
+        this.isFocused = false;
         this.closeMenu();
       }
     }

@@ -3,9 +3,10 @@
     <TfSelectContainer @onInsert={{fn state.onInsert}}
                        @onDestroy={{fn state.onDestroy}}>
       <TfControl class={{state.classesForTfControl}}>
-        <TfMultiValueContainer @onMouseDown={{fn state.onInputMouseDown}}
+        <TfMultiValueContainer @onClick={{fn state.openMenu}}
+                               @onDblClick={{fn state.onInputDblClick}}
                                @onKeyDown={{fn state.onContainerKeyDown}}
-                               @onDblClick={{fn state.onDblClick}}>
+                               @onMouseDown={{fn state.onInputMouseDown}}>
           {{#if state.isMulti}}
             {{#each state.selectedOptions as |option|}}
               <TfMultiValue @value={{option.value}}>
@@ -17,7 +18,10 @@
             {{/each}}
           {{/if}}
           <TfInput>
-            <AutosizeInput @onInput={{action (mut state.value)}}
+            <AutosizeInput @onBlur={{fn state.onInputBlur}}
+                           @onClick={{fn state.openMenu}}
+                           @onFocus={{fn state.onInputFocus}}
+                           @onInput={{action (mut state.value)}}
                            @onKeyDown={{fn state.onInputKeyDown}}
                            @onKeyUp={{fn state.onInputKeyUp}}
                            @placeholder={{state.placeholder}}
