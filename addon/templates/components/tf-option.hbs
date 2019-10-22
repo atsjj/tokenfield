@@ -1,3 +1,7 @@
-<div class="tf-option {{selected}} {{disabled}}" ...attributes {{on "click" this.onClick}}>
+<div class={{join " " "tf-option" selected disabled hover}}
+     ...attributes
+     {{on "click" this.onClick}}
+     {{on "mouseout" this.onMouseOut}}
+     {{on "mouseover" this.onMouseOver}}>
   {{yield}}
 </div>

@@ -63,8 +63,9 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @tracked private selectedOption: Option | undefined;
   @tracked private selectedOptions: Option[] = selectedOptions;
   @tracked private options: Option[] = defaultOptions;
+  @tracked private hoveredOption: Option | undefined;
 
-  private element: HTMLDivElement | undefined;
+  private containerElement: HTMLDivElement | undefined;
   private lastValueLength: number = (this.args.value || '').length;
 
   debug() {
@@ -83,13 +84,99 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     }
   }
 
-  @computed('options', 'selectedOptions')
+  @computed('isMulti', 'options', 'selectedOptions')
   get innerOptions(): Option[] {
-    return this.options.filter(option => !this.selectedOptions.some(selectedOption => isEqual(selectedOption, option)));
+    if (this.isMulti) {
+      return this.options.filter(option => {
+        return !this.selectedOptions.some(selectedOption => isEqual(selectedOption, option))
+      });
+    } else {
+      return this.options;
+    }
   }
 
   get isValuePresent() {
     return this.value.trim().length > 0;
+  }
+
+  @action openMenu() {
+    if (!this.isMenuOpen) {
+      this.hoveredOption = this.innerOptions[0];
+      this.isFocused = true;
+      this.isMenuOpen = true
+    }
+  }
+
+  @action nextMenuOption() {
+    const min = 0;
+
+    this.openMenu();
+
+    if (this.hoveredOption) {
+      let index = this.innerOptions.findIndex(option => isEqual(option, this.hoveredOption)) + 1;
+
+      if (index >= this.innerOptions.length) {
+        index = min;
+      }
+
+      this.hoveredOption = this.innerOptions[index];
+    } else {
+      this.hoveredOption = this.innerOptions[min];
+    }
+  }
+
+  @action prevMenuOption() {
+    const max = this.innerOptions.length - 1;
+
+    this.openMenu();
+
+    if (this.hoveredOption) {
+      let index = this.innerOptions.findIndex(option => isEqual(option, this.hoveredOption)) - 1;
+
+      if (index < 0) {
+        index = max;
+      }
+
+      this.hoveredOption = this.innerOptions[index];
+    } else {
+      this.hoveredOption = this.innerOptions[max];
+    }
+  }
+
+  @action closeMenu(shouldBlur?: boolean) {
+    if (this.isMenuOpen) {
+      this.hoveredOption = undefined;
+      this.isFocused = false;
+      this.isMenuOpen = false;
+      this.value = '';
+
+      if (shouldBlur && this.containerElement) {
+        if (document.activeElement && this.containerElement.contains(document.activeElement)) {
+          (document.activeElement as HTMLElement).blur();
+        }
+      }
+    }
+  }
+
+  @action selectMenuOption(option?: Option): boolean {
+    const selectedOption = option || this.hoveredOption;
+
+    if (selectedOption) {
+      if (this.isMulti) {
+        this.selectedOptions.push(selectedOption);
+        this.selectedOptions = this.selectedOptions;
+      } else {
+        this.selectedOption = selectedOption;
+      }
+
+      this.closeMenu();
+
+      return true;
+    } else {
+      this.closeMenu(true);
+
+      return false;
+    }
   }
 
   @action popOption(): Option | undefined {
@@ -106,12 +193,25 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     this.selectedOptions = this.selectedOptions;
   }
 
+  @action onContainerKeyDown(event: KeyboardEvent) {
+    // console.info('TfStateManager', 'onContainerKeyDown', event);
+    switch (event.key) {
+      case 'ArrowDown': {
+        this.nextMenuOption();
+        break;
+      }
+      case 'ArrowUp': {
+        this.prevMenuOption();
+        break;
+      }
+    }
+  }
+
   /**
    * Focus Event Handler for Input
    */
   @action onInputFocus() {
-    this.isFocused = true;
-    this.isMenuOpen = true;
+    this.openMenu();
   }
 
   /**
@@ -122,13 +222,9 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
    * @param event
    */
   @action onInputKeyUp(event: KeyboardEvent) {
-    const inputElement = (event.target as HTMLInputElement);
-
     switch (event.key) {
       case 'Escape': {
-        if (inputElement) {
-          inputElement.blur();
-        }
+        this.closeMenu();
 
         break;
       }
@@ -154,8 +250,19 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
 
         break;
       }
+      case 'Enter': {
+        if (event.keyCode === 229) {
+          break;
+        }
+
+        this.selectMenuOption();
+
+        break;
+      }
       case 'Tab': {
-        event.preventDefault();
+        if (this.selectMenuOption()) {
+          event.preventDefault();
+        }
         break;
       }
     }
@@ -165,9 +272,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
    * Blur Event Handler for Input
    */
   @action onInputBlur() {
-    this.isFocused = false;
-    this.isMenuOpen = false;
-    this.value = '';
+    this.closeMenu();
   }
 
   /**
@@ -202,33 +307,37 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
 
   @action onOptionClick(_: MouseEvent, option: Option) {
     // console.info('TfStateManager', 'onOptionClick', ...arguments);
+    this.selectMenuOption(option);
+  }
 
-    if (this.isMulti) {
-      this.selectedOptions.push(option);
-      this.selectedOptions = this.selectedOptions;
-    } else {
-      this.selectedOption = option;
+  @action onOptionMouseOut(_: MouseEvent, option: Option) {
+    // console.info('TfStateManager', 'onOptionMouseOut', ...arguments);
+    if (isEqual(this.hoveredOption, option)) {
+      this.hoveredOption = undefined;
     }
   }
 
+  @action onOptionMouseOver(_: MouseEvent, option: Option) {
+    // console.info('TfStateManager', 'onOptionMouseOver', ...arguments);
+    this.hoveredOption = option;
+  }
+
   onBlur(event: MouseEvent) {
-    if (this.element && event.target) {
-      if (!this.element.contains(event.target as HTMLElement)) {
-        this.isFocused = false;
-        this.isMenuOpen = false;
-        this.value = '';
+    if (this.containerElement && event.target) {
+      if (!this.containerElement.contains(event.target as HTMLElement)) {
+        this.closeMenu();
       }
     }
   }
 
   @action onInsert(element: HTMLDivElement) {
-    this.element = element;
+    this.containerElement = element;
 
     document.addEventListener('click', this.onBlur.bind(this));
   }
 
   @action onDestroy() {
-    this.element = undefined;
+    this.containerElement = undefined;
 
     document.removeEventListener('click', this.onBlur.bind(this));
   }

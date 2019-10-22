@@ -4,6 +4,7 @@
                        @onDestroy={{fn state.onDestroy}}>
       <TfControl class={{state.classesForTfControl}}>
         <TfMultiValueContainer @onMouseDown={{fn state.onInputMouseDown}}
+                               @onKeyDown={{fn state.onContainerKeyDown}}
                                @onDblClick={{fn state.onDblClick}}>
           {{#if state.isMulti}}
             {{#each state.selectedOptions as |option|}}
@@ -16,8 +17,7 @@
             {{/each}}
           {{/if}}
           <TfInput>
-            <AutosizeInput @onFocus={{fn state.onInputFocus}}
-                           @onInput={{action (mut state.value)}}
+            <AutosizeInput @onInput={{action (mut state.value)}}
                            @onKeyDown={{fn state.onInputKeyDown}}
                            @onKeyUp={{fn state.onInputKeyUp}}
                            @placeholder={{state.placeholder}}
@@ -46,19 +46,14 @@
       {{#if state.isMenuOpen}}
         <TfMenu>
           <TfMenuList>
-            {{#if state.isMulti}}
-              {{#each state.innerOptions as |option|}}
-                <TfOption @onClick={{fn state.onOptionClick}} @value={{option}}>{{option.label}}</TfOption>
-              {{/each}}
-            {{else}}
-              {{#each state.options as |option|}}
-                {{#if (eq option state.selectedOption)}}
-                  <TfOption @onClick={{fn state.onOptionClick}} @isSelected={{true}} @value={{option}}>{{option.label}}</TfOption>
-                {{else}}
-                  <TfOption @onClick={{fn state.onOptionClick}} @value={{option}}>{{option.label}}</TfOption>
-                {{/if}}
-              {{/each}}
-            {{/if}}
+            {{#each state.innerOptions as |option|}}
+              <TfOption @onClick={{fn state.onOptionClick}}
+                        @onMouseOut={{fn state.onOptionMouseOut}}
+                        @onMouseOver={{fn state.onOptionMouseOver}}
+                        @isSelected={{eq option state.selectedOption}}
+                        @isHovered={{eq option state.hoveredOption}}
+                        @value={{option}}>{{option.label}} ({{eq option state.hoveredOption}})</TfOption>
+            {{/each}}
           </TfMenuList>
         </TfMenu>
       {{/if}}
