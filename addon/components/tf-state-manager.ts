@@ -1,18 +1,25 @@
-import { action, computed } from '@ember/object';
+import { action } from '@ember/object';
+import { isEqual } from '@ember/utils';
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
-import { isEqual } from '@ember/utils';
+import createFilter, { isPresent } from '../-private/filter';
 
-interface TfStateManagerArgs {
-  onInput?: Function;
-  value?: string;
-  placeholder?: string;
+export interface StateManager {
+  register: () => void;
+  deregister: () => void;
 }
 
 export interface Option {
   value: string,
   label: string,
   [key: string]: any
+}
+
+interface TfStateManagerArgs {
+  onInput?: Function;
+  value?: string;
+  placeholder?: string;
+  options?: Option[];
 }
 
 const defaultOptions: Option[] = [
@@ -53,105 +60,138 @@ const selectedOptions: Option[] = [
   }
 ];
 
-export default class TfStateManager extends Component<TfStateManagerArgs> {
+export default class TfStateManager extends Component<TfStateManagerArgs & StateManager> {
   @tracked private isMulti: boolean = true;
   @tracked private isFocused: boolean = false;
   @tracked private isMenuOpen: boolean = false;
   @tracked private placeholder: string = this.args.placeholder || '';
-  @tracked private value: string = this.args.value || '';
   @tracked private isLoading: boolean = false;
-  @tracked private selectedOption: Option | undefined;
-  @tracked private selectedOptions: Option[] = selectedOptions;
-  @tracked private options: Option[] = defaultOptions;
-  @tracked private hoveredOption: Option | undefined;
 
   private containerElement: HTMLDivElement | undefined;
   private lastValueLength: number = (this.args.value || '').length;
 
-  debug() {
-    this.isMenuOpen;
-    this.placeholder;
-    this.isLoading;
-    this.isMulti;
-    this.selectedOption;
+  @tracked private options: Option[] = this.args.options || defaultOptions;
+  @tracked private value: string = this.args.value || '';
+  @tracked private filteredOptions: Option[] = this.options;
+  @tracked private activeOption: Option | undefined;
+  @tracked private hoveredOption: Option | undefined;
+  @tracked private selectedOption: Option | undefined;
+  @tracked private selectedOptions: Option[] = selectedOptions;
+
+  get debug() {
+    return [
+      this.placeholder,
+      this.isLoading,
+      this.selectedOption,
+    ];
   }
 
-  get classesForTfControl(): string {
-    if (this.isFocused) {
-      return 'tf-control-focused';
-    } else {
-      return '';
+  get focused(): string {
+    return this.isFocused ? 'tf-control-focused' : '';
+  }
+
+  get isValuePresent(): boolean {
+    return isPresent(this.value);
+  }
+
+  @action filterOptions(value?: string) {
+    console.info('TfStateManager', 'filterOptions', ...arguments);
+    const filter = createFilter(value || '');
+
+    this.value = value || '';
+
+    this.filteredOptions = this.options.filter(option => {
+      return ((this.isValuePresent ? filter(option) : true) &&
+        !this.selectedOptions.some(selectedOption => isEqual(option, selectedOption)));
+    });
+
+    this.hoveredOption = this.filteredOptions[0];
+  }
+
+  @action activateOption(option: Option) {
+    this.activeOption = option;
+  }
+
+  @action deactivateOption(option: Option) {
+    if (isEqual(this.activeOption, option)) {
+      this.activeOption = undefined;
     }
   }
 
-  @computed('isMulti', 'options', 'selectedOptions')
-  get innerOptions(): Option[] {
-    if (this.isMulti) {
-      return this.options.filter(option => {
-        return !this.selectedOptions.some(selectedOption => isEqual(selectedOption, option))
-      });
-    } else {
-      return this.options;
+  @action hoverOption(option: Option) {
+    this.hoveredOption = option;
+  }
+
+  @action dehoverOption(option: Option) {
+    if (isEqual(this.hoveredOption, option)) {
+      this.hoveredOption = undefined;
     }
   }
 
-  get isValuePresent() {
-    return this.value.trim().length > 0;
+  @action selectOption(option?: Option) {
+    const value = option || this.hoveredOption;
+
+    if (value) {
+      if (this.isMulti) {
+        this.selectedOptions.push(value);
+        this.selectedOptions = this.selectedOptions;
+      } else {
+        this.selectedOption = value;
+      }
+    }
+  }
+
+  @action clearValue() {
+    this.filterOptions();
   }
 
   @action openMenu() {
     console.info('TfStateManager', 'openMenu');
     if (!this.isMenuOpen) {
-      this.hoveredOption = this.innerOptions[0];
+      this.hoveredOption = this.filteredOptions[0];
       this.isFocused = true;
       this.isMenuOpen = true
     }
   }
 
   @action nextMenuOption() {
-    const isMenuOpen = this.isMenuOpen;
     const min = 0;
 
-    this.openMenu();
+    if (this.hoveredOption) {
+      let index = this.filteredOptions.findIndex(option => isEqual(option, this.hoveredOption)) + 1;
 
-
-    if (this.hoveredOption && isMenuOpen) {
-      let index = this.innerOptions.findIndex(option => isEqual(option, this.hoveredOption)) + 1;
-
-      if (index >= this.innerOptions.length) {
+      if (index >= this.filteredOptions.length) {
         index = min;
       }
 
-      this.hoveredOption = this.innerOptions[index];
+      this.hoveredOption = this.filteredOptions[index];
     } else {
-      this.hoveredOption = this.innerOptions[min];
+      this.hoveredOption = this.filteredOptions[min];
     }
   }
 
   @action prevMenuOption() {
-    const isMenuOpen = this.isMenuOpen;
-    const max = this.innerOptions.length - 1;
+    const max = this.filteredOptions.length - 1;
 
-    this.openMenu();
-
-    if (this.hoveredOption && isMenuOpen) {
-      let index = this.innerOptions.findIndex(option => isEqual(option, this.hoveredOption)) - 1;
+    if (this.hoveredOption) {
+      let index = this.filteredOptions.findIndex(option => isEqual(option, this.hoveredOption)) - 1;
 
       if (index < 0) {
         index = max;
       }
 
-      this.hoveredOption = this.innerOptions[index];
+      this.hoveredOption = this.filteredOptions[index];
     } else {
-      this.hoveredOption = this.innerOptions[max];
+      this.hoveredOption = this.filteredOptions[max];
     }
   }
 
   @action closeMenu(shouldBlur?: boolean) {
     if (this.isMenuOpen) {
+      this.activeOption = undefined;
       this.hoveredOption = undefined;
       this.isMenuOpen = false;
-      this.value = '';
+      this.filterOptions();
     }
 
     if (shouldBlur && this.containerElement) {
@@ -191,6 +231,8 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
 
     this.selectedOptions = this.selectedOptions;
 
+    this.filterOptions();
+
     return value;
   }
 
@@ -198,6 +240,8 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     this.selectedOptions.push(...value);
 
     this.selectedOptions = this.selectedOptions;
+
+    this.filterOptions();
   }
 
   @action onContainerKeyDown(event: KeyboardEvent) {
@@ -217,36 +261,15 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   /**
    * Focus Event Handler for Input
    */
-  @action onInputFocus() {
+  @action focus() {
     this.isFocused = true;
   }
 
-  /**
-   * KeyUp Event Handler for Input
-   *
-   * Escape - Blur and clear the input.
-   *
-   * @param event
-   */
-  @action onInputKeyUp(event: KeyboardEvent) {
-    switch (event.key) {
-      case 'Escape': {
-        this.closeMenu();
-
-        break;
-      }
-    }
+  @action blur() {
+    this.isFocused = false;
   }
 
-  /**
-   * KeyDown Event Handler for Input
-   *
-   * Tab - In order to assist tab completion, this must happen on key down in order to prevent
-   *       the default behavior of going to the next field in the browser.
-   *
-   * @param event
-   */
-  @action onInputKeyDown(event: KeyboardEvent) {
+  @action handleAccelerator(event: KeyboardEvent) {
     this.lastValueLength = this.value.length;
 
     switch (event.key) {
@@ -266,11 +289,20 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
 
         break;
       }
+      case 'Escape': {
+        this.closeMenu();
+
+        break;
+      }
       case 'Tab': {
         if (this.selectMenuOption()) {
           event.preventDefault();
         }
+        this.closeMenu();
         break;
+      }
+      default: {
+        this.openMenu();
       }
     }
   }
