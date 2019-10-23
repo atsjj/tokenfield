@@ -244,13 +244,19 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
 
     switch (event.key) {
       case 'ArrowDown': {
-        this.openMenu(false);
-        this.nextMenuOption();
+        if (this.isMenuOpen) {
+          this.nextMenuOption();
+        } else {
+          this.openMenu(true);
+        }
         break;
       }
       case 'ArrowUp': {
-        this.openMenu(false);
-        this.prevMenuOption();
+        if (this.isMenuOpen) {
+          this.prevMenuOption();
+        } else {
+          this.openMenu(true);
+        }
         break;
       }
       case 'Backspace': {
