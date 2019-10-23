@@ -4,11 +4,6 @@ import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
 import createFilter, { isPresent } from '../-private/filter';
 
-export interface StateManager {
-  register: () => void;
-  deregister: () => void;
-}
-
 export interface Option {
   value: string,
   label: string,
@@ -104,8 +99,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
       return ((this.isValuePresent ? filter(option) : true) &&
         !this.selectedOptions.some(selectedOption => isEqual(option, selectedOption)));
     });
-
-    this.hoveredOption = this.filteredOptions[0];
   }
 
   @action activateOption(option: Option) {
@@ -128,7 +121,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
     }
   }
 
-  @action selectOption(option?: Option) {
+  @action selectOption(option?: Option): boolean {
     const value = option || this.hoveredOption;
 
     if (value) {
@@ -138,6 +131,14 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
       } else {
         this.selectedOption = value;
       }
+
+      this.closeMenu();
+
+      return true;
+    } else {
+      this.closeMenu();
+
+      return false;
     }
   }
 
@@ -145,10 +146,12 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
     this.filterOptions();
   }
 
-  @action openMenu() {
+  @action openMenu(setHoveredOption: boolean = true) {
     console.info('TfStateManager', 'openMenu');
     if (!this.isMenuOpen) {
-      this.hoveredOption = this.filteredOptions[0];
+      if (!this.hoveredOption && setHoveredOption) {
+        this.hoveredOption = this.filteredOptions[0];
+      }
       this.isFocused = true;
       this.isMenuOpen = true
     }
@@ -159,6 +162,8 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
 
     if (this.hoveredOption) {
       let index = this.filteredOptions.findIndex(option => isEqual(option, this.hoveredOption)) + 1;
+
+      console.info('TfStateManager', 'nextMenuOption', index);
 
       if (index >= this.filteredOptions.length) {
         index = min;
@@ -176,6 +181,8 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
     if (this.hoveredOption) {
       let index = this.filteredOptions.findIndex(option => isEqual(option, this.hoveredOption)) - 1;
 
+      console.info('TfStateManager', 'prevMenuOption', index);
+
       if (index < 0) {
         index = max;
       }
@@ -187,12 +194,10 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
   }
 
   @action closeMenu(shouldBlur?: boolean) {
-    if (this.isMenuOpen) {
-      this.activeOption = undefined;
-      this.hoveredOption = undefined;
-      this.isMenuOpen = false;
-      this.filterOptions();
-    }
+    this.activeOption = undefined;
+    this.hoveredOption = undefined;
+    this.isMenuOpen = false;
+    this.filterOptions();
 
     if (shouldBlur && this.containerElement) {
       if (document.activeElement && this.containerElement.contains(document.activeElement)) {
@@ -202,27 +207,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
       } else {
         console.info('TfStateManager', 'closeMenu', 'partially blur');
       }
-    }
-  }
-
-  @action selectMenuOption(option?: Option): boolean {
-    const selectedOption = option || this.hoveredOption;
-
-    if (selectedOption) {
-      if (this.isMulti) {
-        this.selectedOptions.push(selectedOption);
-        this.selectedOptions = this.selectedOptions;
-      } else {
-        this.selectedOption = selectedOption;
-      }
-
-      this.closeMenu();
-
-      return true;
-    } else {
-      this.closeMenu(true);
-
-      return false;
     }
   }
 
@@ -244,20 +228,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
     this.filterOptions();
   }
 
-  @action onContainerKeyDown(event: KeyboardEvent) {
-    // console.info('TfStateManager', 'onContainerKeyDown', event);
-    switch (event.key) {
-      case 'ArrowDown': {
-        this.nextMenuOption();
-        break;
-      }
-      case 'ArrowUp': {
-        this.prevMenuOption();
-        break;
-      }
-    }
-  }
-
   /**
    * Focus Event Handler for Input
    */
@@ -273,6 +243,16 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
     this.lastValueLength = this.value.length;
 
     switch (event.key) {
+      case 'ArrowDown': {
+        this.openMenu(false);
+        this.nextMenuOption();
+        break;
+      }
+      case 'ArrowUp': {
+        this.openMenu(false);
+        this.prevMenuOption();
+        break;
+      }
       case 'Backspace': {
         if (this.lastValueLength <= 0) {
           this.popOption();
@@ -285,17 +265,15 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
           break;
         }
 
-        this.selectMenuOption();
-
+        this.selectOption();
         break;
       }
       case 'Escape': {
         this.closeMenu();
-
         break;
       }
       case 'Tab': {
-        if (this.selectMenuOption()) {
+        if (this.selectOption()) {
           event.preventDefault();
         }
         this.closeMenu();
@@ -352,7 +330,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs & State
 
   @action onOptionClick(_: MouseEvent, option: Option) {
     // console.info('TfStateManager', 'onOptionClick', ...arguments);
-    this.selectMenuOption(option);
+    this.selectOption(option);
   }
 
   @action onOptionMouseOut(_: MouseEvent, option: Option) {

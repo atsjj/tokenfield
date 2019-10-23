@@ -5,7 +5,6 @@
       <TfControl class={{state.focused}}>
         <TfMultiValueContainer @onClick={{fn state.openMenu}}
                                @onDblClick={{fn state.onInputDblClick}}
-                               @onKeyDown={{fn state.onContainerKeyDown}}
                                @onMouseDown={{fn state.onInputMouseDown}}>
           {{#if state.isMulti}}
             {{#each state.selectedOptions as |option|}}
@@ -58,7 +57,9 @@
                         @onActivateEnd={{fn state.deactivateOption}}
                         @onHoverStart={{fn state.hoverOption}}
                         @onHoverEnd={{fn state.dehoverOption}}
-                        @onSelect={{fn state.selectOption}}>{{option.label}}</TfOption>
+                        @onSelect={{fn state.selectOption}}>
+                {{option.label}}
+              </TfOption>
             {{else}}
               <TfOption @isDisabled={{true}}>No Options</TfOption>
             {{/each}}
