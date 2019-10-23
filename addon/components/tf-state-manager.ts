@@ -55,7 +55,7 @@ const selectedOptions: Option[] = [
   }
 ];
 
-export default class TfStateManager extends Component<TfStateManagerArgs & StateManager> {
+export default class TfStateManager extends Component<TfStateManagerArgs> {
   @tracked private isMulti: boolean = true;
   @tracked private isFocused: boolean = false;
   @tracked private isMenuOpen: boolean = false;
