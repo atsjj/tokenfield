@@ -2,8 +2,17 @@
   -webkit-box-align: center;
   align-items: center;
   display: flex;
-  padding-left: 4px;
-  padding-right: 4px;
+  padding-left: var(--base-unit);
+  padding-right: var(--base-unit);
   box-sizing: border-box;
-  border-radius: 2px;
+  border-radius: calc(var(--border-radius) / 2);
+}
+
+.tf-multi-value-remove:active {
+  background-color: var(--danger-light);
+}
+
+.tf-multi-value-remove:hover:not(:active) {
+  background-color: var(--danger-light);
+  color: var(--danger);
 }

@@ -1,5 +1,14 @@
+import { action } from '@ember/object';
 import Component from '@glimmer/component';
 
-export default class TfIndicator extends Component {
+interface TfIndicatorArgs {
+  onClick?: (event: MouseEvent) => Promise<void> | void;
+}
 
+export default class TfIndicator extends Component<TfIndicatorArgs> {
+  @action onClick(event: MouseEvent) {
+    if (this.args.onClick) {
+      this.args.onClick(event);
+    }
+  }
 }
