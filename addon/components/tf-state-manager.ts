@@ -10,7 +10,7 @@ export interface Option {
   [key: string]: any
 }
 
-interface FetchOptions {
+export interface FetchOptions {
   (value: string): Promise<Option[]>
 }
 

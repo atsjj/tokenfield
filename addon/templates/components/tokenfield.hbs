@@ -1,1 +1,4 @@
-<TfStateManager {{did-insert this.filterOptions}} />
+<TfStateManager @onSelect={{fn this.onSelect}}
+                @placeholder={{this.placeholder}}
+                @value={{this.value}}
+                {{did-insert this.filterOptions}} />
