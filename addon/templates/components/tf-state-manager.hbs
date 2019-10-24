@@ -1,1 +1,73 @@
-{{yield this}}
+<TfSelect>
+  <TfSelectContainer @onInsert={{fn this.onInsert}}
+                      @onDestroy={{fn this.onDestroy}}>
+    <TfControl class={{this.focused}}>
+      <TfMultiValueContainer @onClick={{fn this.openMenu}}
+                              @onDblClick={{fn this.onInputDblClick}}
+                              @onMouseDown={{fn this.onInputMouseDown}}>
+        {{#if this.isMulti}}
+          {{#each this.selectedOptions as |option|}}
+            <TfMultiValue @value={{option.value}}>
+              <TfMultiValueLabel>{{option.label}}</TfMultiValueLabel>
+              <TfMultiValueRemove @onClick={{fn this.removeOption option}}>
+                <TfCrossIcon @size={{14}} />
+              </TfMultiValueRemove>
+            </TfMultiValue>
+          {{/each}}
+        {{/if}}
+        <TfInput>
+          <AutosizeInput @onBlur={{fn this.onBlur}}
+                          @onClick={{fn this.openMenu}}
+                          @onFocus={{fn this.focus}}
+                          @onInput={{fn this.filterOptions}}
+                          @onKeyDown={{fn this.handleAccelerator}}
+                          @placeholder={{@placeholder}}
+                          @value={{@value}} />
+        </TfInput>
+      </TfMultiValueContainer>
+      <TfIndicatorsContainer>
+        {{#if this.isValuePresent}}
+          <TfClearIndicator @onClick={{fn this.clearValue}}>
+            <TfCrossIcon />
+          </TfClearIndicator>
+        {{/if}}
+        {{#if this.isLoading}}
+          <TfLoadingIndicator>
+            <TfLoadingDot />
+            <TfLoadingDot />
+            <TfLoadingDot />
+          </TfLoadingIndicator>
+        {{/if}}
+        <TfIndicatorSeparator />
+        <TfDropdownIndicator @onClick={{fn this.openMenu}}>
+          <TfDownChevron />
+        </TfDropdownIndicator>
+      </TfIndicatorsContainer>
+    </TfControl>
+    {{#if this.isMenuOpen}}
+      <TfMenu>
+        <TfMenuList>
+          {{#if this.isLoading}}
+            <TfOption @isDisabled={{true}}>Loading...</TfOption>
+          {{else}}
+            {{#each this.filteredOptions as |option|}}
+              <TfOption @isActive={{eq option this.activeOption}}
+                        @isHovered={{eq option this.hoveredOption}}
+                        @isSelected={{eq option this.selectedOption}}
+                        @value={{option}}
+                        @onActivateStart={{fn this.activateOption}}
+                        @onActivateEnd={{fn this.deactivateOption}}
+                        @onHoverStart={{fn this.hoverOption}}
+                        @onHoverEnd={{fn this.dehoverOption}}
+                        @onSelect={{fn this.selectOption}}>
+                {{option.label}}
+              </TfOption>
+            {{else}}
+              <TfOption @isDisabled={{true}}>No Options</TfOption>
+            {{/each}}
+          {{/if}}
+        </TfMenuList>
+      </TfMenu>
+    {{/if}}
+  </TfSelectContainer>
+</TfSelect>

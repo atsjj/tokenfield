@@ -23,8 +23,8 @@ export function trimString(value: string, noop: boolean): string {
   return noop ? value : value.replace(/^\s+|\s+$/g, '');
 }
 
-export function isPresent(value: string): boolean {
-  return trimString(value, false).length > 0;
+export function isPresent(value?: string): boolean {
+  return value ? trimString(value, false).length > 0 : false;
 }
 
 function toString({ label, value }: Option): string {

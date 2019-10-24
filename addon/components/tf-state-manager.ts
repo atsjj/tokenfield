@@ -10,59 +10,15 @@ export interface Option {
   [key: string]: any
 }
 
-interface TfStateManagerArgs {
-  onInput?: Function;
-  value?: string;
-  placeholder?: string;
-  options?: Option[];
-}
-
-const defaultOptions: Option[] = [
-  {
-    label: 'Red',
-    value: 'red',
-  },
-  {
-    label: 'Green',
-    value: 'green',
-  },
-  {
-    label: 'Blue',
-    value: 'blue',
-  },
-  {
-    label: 'Cyan',
-    value: 'cyan',
-  },
-  {
-    label: 'Magenta',
-    value: 'magenta',
-  },
-  {
-    label: 'Yellow',
-    value: 'yellow',
-  },
-  {
-    label: 'Black',
-    value: 'black',
-  },
-];
-
-const selectedOptions: Option[] = [
-  {
-    label: 'Orange',
-    value: 'orange',
-  }
-];
-
 interface FetchOptions {
   (value: string): Promise<Option[]>
 }
 
-function fakeOptions(): Promise<Option[]> {
-  return new Promise(resolve => {
-    setTimeout(() => resolve(defaultOptions), 500);
-  });
+interface TfStateManagerArgs {
+  value?: string;
+  placeholder?: string;
+  options?: Option[] | FetchOptions;
+  onSelect: (option: Option | Option[]) => Promise<void> | void;
 }
 
 export default class TfStateManager extends Component<TfStateManagerArgs> {
@@ -73,11 +29,8 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @tracked private isLoading: boolean = false;
   @tracked private isMenuOpen: boolean = false;
   @tracked private isMulti: boolean = true;
-  @tracked private options: Option[] | FetchOptions = this.args.options || fakeOptions;
-  @tracked private placeholder: string = this.args.placeholder || '';
   @tracked private selectedOption: Option | undefined;
-  @tracked private selectedOptions: Option[] = selectedOptions;
-  @tracked private value: string = this.args.value || '';
+  @tracked private selectedOptions: Option[] = [];
 
   private containerElement: HTMLDivElement | undefined;
   private lastValueLength: number = (this.args.value || '').length;
@@ -85,15 +38,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   constructor(owner: unknown, args: TfStateManagerArgs) {
     super(owner, args);
 
-    this.filterOptions(this.value);
-  }
-
-  get debug() {
-    return [
-      this.placeholder,
-      this.isLoading,
-      this.selectedOption,
-    ];
+    this.filterOptions(this.args.value);
   }
 
   get focused(): string {
@@ -101,28 +46,32 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   get isValuePresent(): boolean {
-    return isPresent(this.value);
+    return isPresent(this.args.value);
   }
 
   async getOptions(): Promise<Option[]> {
-    if (Array.isArray(this.options)) {
-      return this.options;
+    if (this.args.options && this.args.value) {
+      if (Array.isArray(this.args.options)) {
+        return this.args.options;
+      } else {
+        this.isLoading = true;
+
+        const options = await this.args.options(this.args.value);
+
+        this.isLoading = false;
+
+        return options;
+      }
     } else {
-      this.isLoading = true;
-
-      const options = await this.options(this.value);
-
-      this.isLoading = false;
-
-      return options;
+      return [];
     }
   }
 
   @action async filterOptions(value?: string) {
-    console.info('TfStateManager', 'filterOptions', ...arguments);
+    // console.info('TfStateManager', 'filterOptions', ...arguments);
     const filter = createFilter(value || '');
 
-    this.value = value || '';
+    this.args.value = value || '';
 
     this.filteredOptions = (await this.getOptions()).filter(option => {
       return ((this.isValuePresent ? filter(option) : true) &&
@@ -176,7 +125,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action openMenu(setHoveredOption: boolean = true) {
-    console.info('TfStateManager', 'openMenu');
+    // console.info('TfStateManager', 'openMenu');
     if (!this.isMenuOpen) {
       if (!this.hoveredOption && setHoveredOption) {
         this.hoveredOption = this.filteredOptions[0];
@@ -196,7 +145,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     if (this.hoveredOption) {
       let index = this.filteredOptions.findIndex(option => isEqual(option, this.hoveredOption)) + 1;
 
-      console.info('TfStateManager', 'nextMenuOption', index);
+      // console.info('TfStateManager', 'nextMenuOption', index);
 
       if (index >= this.filteredOptions.length) {
         index = min;
@@ -214,7 +163,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     if (this.hoveredOption) {
       let index = this.filteredOptions.findIndex(option => isEqual(option, this.hoveredOption)) - 1;
 
-      console.info('TfStateManager', 'prevMenuOption', index);
+      // console.info('TfStateManager', 'prevMenuOption', index);
 
       if (index < 0) {
         index = max;
@@ -234,17 +183,17 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
 
     if (shouldBlur && this.containerElement) {
       if (document.activeElement && this.containerElement.contains(document.activeElement)) {
-        console.info('TfStateManager', 'closeMenu', 'fully blur');
+        // console.info('TfStateManager', 'closeMenu', 'fully blur');
         (document.activeElement as HTMLElement).blur();
         this.isFocused = false;
       } else {
-        console.info('TfStateManager', 'closeMenu', 'partially blur');
+        // console.info('TfStateManager', 'closeMenu', 'partially blur');
       }
     }
   }
 
-  @action removeOption(option: Option, event: MouseEvent) {
-    console.info('TfStateManager', 'removeOption', option, event);
+  @action removeOption(option: Option) {
+    // console.info('TfStateManager', 'removeOption', option, event);
 
     this.selectedOptions = this.selectedOptions
       .filter(selectedOption => !isEqual(selectedOption, option));
@@ -280,7 +229,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action handleAccelerator(event: KeyboardEvent) {
-    this.lastValueLength = this.value.length;
+    this.lastValueLength = this.args.value ? this.args.value.length : 0;
 
     switch (event.key) {
       case 'ArrowDown': {
@@ -312,7 +261,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
         }
 
         this.selectOption();
-        this.value = '';
+        this.args.value = '';
         break;
       }
       case 'Escape': {
@@ -322,7 +271,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
       case 'Tab': {
         if (this.selectOption()) {
           event.preventDefault();
-          this.value = '';
+          this.args.value = '';
         }
         this.closeMenu();
         break;
@@ -337,7 +286,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
    * Blur Event Handler for Input
    */
   @action onInputBlur() {
-    console.info('TfStateManager', 'onInputBlur', ...arguments);
+    // console.info('TfStateManager', 'onInputBlur', ...arguments);
 
     if (this.containerElement) {
       if (!document.activeElement && this.containerElement.contains(document.activeElement)) {
@@ -404,7 +353,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action onInsert(element: HTMLDivElement) {
-    console.info('TfStateManager', 'onInsert', ...arguments);
+    // console.info('TfStateManager', 'onInsert', ...arguments);
 
     this.containerElement = element;
 
@@ -412,7 +361,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action onDestroy() {
-    console.info('TfStateManager', 'onDestroy', ...arguments);
+    // console.info('TfStateManager', 'onDestroy', ...arguments);
 
     this.containerElement = undefined;
 

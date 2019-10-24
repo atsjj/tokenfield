@@ -12,6 +12,10 @@ module('Integration | Helper | join', function(hooks) {
 
     await render(hbs`{{join inputValue}}`);
 
-    assert.equal(this.element.textContent.trim(), '1234');
+    if (this.element && this.element.textContent) {
+      assert.equal(this.element.textContent.trim(), '1234');
+    } else {
+      assert.ok(false, 'this.element.textContent is null');
+    }
   });
 });
