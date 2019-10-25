@@ -7,12 +7,12 @@ interface TfOptionArgs {
   isDisabled?: boolean;
   isHovered?: boolean;
   isSelected?: boolean;
-  value?: Option;
-  onActivateStart?: (option: Option, event: MouseEvent) => Promise<void> | void;
   onActivateEnd?: (option: Option, event: MouseEvent) => Promise<void> | void;
-  onHoverStart?: (option: Option, event: MouseEvent) => Promise<void> | void;
+  onActivateStart?: (option: Option, event: MouseEvent) => Promise<void> | void;
   onHoverEnd?: (option: Option, event: MouseEvent) => Promise<void> | void;
+  onHoverStart?: (option: Option, event: MouseEvent) => Promise<void> | void;
   onSelect?: (option: Option, event: MouseEvent) => Promise<void> | void;
+  value?: Option;
 }
 
 export default class TfOption extends Component<TfOptionArgs> {

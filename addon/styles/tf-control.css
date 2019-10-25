@@ -18,11 +18,11 @@
   transition: all 100ms ease 0s;
 }
 
-.tf-control-disabled {
+.tf-control.disabled {
   border-color: var(--neutral-10);
 }
 
-.tf-control-focused {
+.tf-control.focused:not(.disabled) {
   border-color: var(--primary);
   box-shadow: 0 0 0 1px var(--primary);
 }

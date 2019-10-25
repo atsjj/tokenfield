@@ -3,6 +3,8 @@ import { isEqual } from '@ember/utils';
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
 import createFilter, { isPresent } from '../-private/filter';
+import { run, join } from '@ember/runloop';
+import { async } from 'rsvp';
 
 export interface Option {
   value: string,
@@ -15,11 +17,12 @@ export interface FetchOptions {
 }
 
 interface TfStateManagerArgs {
-  value?: string;
-  placeholder?: string;
-  options?: Option[] | FetchOptions;
+  isMulti?: boolean;
   onInput?: (value?: string) => Promise<void> | void;
-  onSelect?: (option: Option | Option[]) => Promise<void> | void;
+  onSelect?: (option?: Option | Option[]) => Promise<void> | void;
+  options?: Option[] | FetchOptions;
+  placeholder?: string;
+  value?: string;
 }
 
 export default class TfStateManager extends Component<TfStateManagerArgs> {
@@ -29,7 +32,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @tracked private isFocused: boolean = false;
   @tracked private isLoading: boolean = false;
   @tracked private isMenuOpen: boolean = false;
-  @tracked private isMulti: boolean = true;
   @tracked private selectedOption: Option | undefined;
   @tracked private selectedOptions: Option[] = [];
 
@@ -42,12 +44,24 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     this.onInput(this.args.value);
   }
 
+  get placeholder(): string {
+    if (this.selectedOption && !this.args.isMulti) {
+      return this.selectedOption.label;
+    } else {
+      return this.args.placeholder || '';
+    }
+  }
+
   get focused(): string {
     return this.isFocused ? 'tf-control-focused' : '';
   }
 
   get isValuePresent(): boolean {
     return isPresent(this.args.value);
+  }
+
+  get isClearable(): boolean {
+    return this.isValuePresent || !!this.selectedOption;
   }
 
   async getOptions(): Promise<Option[]> {
@@ -101,11 +115,13 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action async onInput(value?: string) {
+    // console.info('TfStateManager', 'onInput', value, event);
+
     if (this.args.onInput) {
       this.args.onInput(value);
     }
 
-    if (value || isPresent(value)) {
+    if (isPresent(value)) {
       this.openMenu(false);
 
       const filter = createFilter(value);
@@ -113,7 +129,9 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
       this.filteredOptions = (await this.fetchOptions(value))
         .filter(option => filter(option) && !this.isSelected(option));
 
-      this.openMenu();
+      if (this.isMenuOpen) {
+        this.hoveredOption = this.filteredOptions[0];
+      }
     }
   }
 
@@ -141,7 +159,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     const value = option || this.hoveredOption;
 
     if (value) {
-      if (this.isMulti) {
+      if (this.args.isMulti) {
         this.selectedOptions.push(value);
         this.selectedOptions = this.selectedOptions;
 
@@ -155,19 +173,23 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
           this.args.onSelect(this.selectedOption);
         }
       }
-
-      this.closeMenu();
-
-      return true;
-    } else {
-      this.closeMenu();
-
-      return false;
     }
+
+    this.closeMenu();
+
+    return !!value;
   }
 
-  @action clearValue() {
-    this.onInput();
+  @action clearValue(shouldClearSelectedOption: boolean = false) {
+    if (this.isValuePresent) {
+      this.onInput();
+    } else if (shouldClearSelectedOption) {
+      this.selectedOption = undefined;
+
+      if (this.args.onSelect) {
+        this.args.onSelect(this.selectedOption);
+      }
+    }
   }
 
   @action openMenu(setHoveredOption: boolean = true) {
@@ -224,6 +246,8 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action closeMenu(shouldBlur?: boolean) {
+    // console.info('TfStateManager', 'closeMenu');
+
     this.activeOption = undefined;
     this.hoveredOption = undefined;
     this.isMenuOpen = false;
@@ -284,16 +308,20 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
         if (this.isMenuOpen) {
           this.nextMenuOption();
         } else {
+          // console.info('TfStateManager', 'handleAccelerator', 'ArrowDown', 'openMenu');
           this.openMenu(true);
         }
+
         break;
       }
       case 'ArrowUp': {
         if (this.isMenuOpen) {
           this.prevMenuOption();
         } else {
+          // console.info('TfStateManager', 'handleAccelerator', 'ArrowUp', 'openMenu');
           this.openMenu(true);
         }
+
         break;
       }
       case 'Backspace': {
@@ -309,24 +337,30 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
         }
 
         this.selectOption();
-        this.onInput();
+        this.clearValue();
+
         break;
       }
       case 'Escape': {
+        // console.info('TfStateManager', 'handleAccelerator', 'Escape', 'closeMenu');
         this.closeMenu();
+
         break;
       }
       case 'Tab': {
         if (this.selectOption()) {
           event.preventDefault();
-          this.onInput();
         }
+
+        this.clearValue();
+        // console.info('TfStateManager', 'handleAccelerator', 'Tab', 'closeMenu');
         this.closeMenu();
+
         break;
       }
-      // default: {
-      //   this.openMenu();
-      // }
+      default: {
+        // this.openMenu();
+      }
     }
   }
 

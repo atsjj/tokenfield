@@ -4,10 +4,11 @@
          autocomplete="off"
          autocorrect="off"
          spellcheck="false"
-         style={{calculate-size this.inputRef @minWidth @value}}
+         style={{calculate-size this.inputRef @minWidth @value @placeholder}}
          tabindex="0"
          type="text"
          value={{@value}}
+         placeholder={{@placeholder}}
          {{on "blur" this.onBlur}}
          {{on "click" this.onClick}}
          {{on "focus" this.onFocus}}

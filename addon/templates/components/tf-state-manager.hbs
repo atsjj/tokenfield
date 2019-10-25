@@ -1,11 +1,11 @@
 <TfSelect>
   <TfSelectContainer @onInsert={{fn this.onInsert}}
                      @onDestroy={{fn this.onDestroy}}>
-    <TfControl class={{this.focused}}>
+    <TfControl @isFocused={{this.focused}}>
       <TfMultiValueContainer @onClick={{fn this.openMenu}}
                              @onDblClick={{fn this.onInputDblClick}}
                              @onMouseDown={{fn this.onInputMouseDown}}>
-        {{#if this.isMulti}}
+        {{#if @isMulti}}
           {{#each this.selectedOptions as |option|}}
             <TfMultiValue @value={{option.value}}>
               <TfMultiValueLabel>{{option.label}}</TfMultiValueLabel>
@@ -21,13 +21,13 @@
                          @onFocus={{fn this.focus}}
                          @onInput={{fn this.onInput}}
                          @onKeyDown={{fn this.handleAccelerator}}
-                         @placeholder={{@placeholder}}
+                         @placeholder={{this.placeholder}}
                          @value={{@value}} />
         </TfInput>
       </TfMultiValueContainer>
       <TfIndicatorsContainer>
-        {{#if this.isValuePresent}}
-          <TfClearIndicator @onClick={{fn this.clearValue}}>
+        {{#if this.isClearable}}
+          <TfClearIndicator @onClick={{fn this.clearValue true}}>
             <TfCrossIcon />
           </TfClearIndicator>
         {{/if}}
