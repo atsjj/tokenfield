@@ -1,7 +1,8 @@
 <TfStateManager @isMulti={{this.isMulti}}
+                @updateOptions={{fn this.updateOptions}}
                 @onInput={{fn this.onInput}}
                 @onSelect={{fn this.onSelect}}
-                @options={{@options}}
+                @options={{this.options}}
                 @placeholder={{this.placeholder}}
                 @value={{this.value}}
                 {{did-insert this.filterOptions}} />

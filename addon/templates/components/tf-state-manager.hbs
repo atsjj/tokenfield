@@ -50,7 +50,7 @@
           {{#if this.isLoading}}
             <TfOption @isDisabled={{true}}>Loading...</TfOption>
           {{else}}
-            {{#each this.filteredOptions as |option|}}
+            {{#each this.options as |option|}}
               <TfOption @isActive={{eq option this.activeOption}}
                         @isHovered={{eq option this.hoveredOption}}
                         @isSelected={{eq option this.selectedOption}}

@@ -3,8 +3,6 @@ import { isEqual } from '@ember/utils';
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
 import createFilter, { isPresent } from '../-private/filter';
-import { run, join } from '@ember/runloop';
-import { async } from 'rsvp';
 
 export interface Option {
   value: string,
@@ -20,14 +18,15 @@ interface TfStateManagerArgs {
   isMulti?: boolean;
   onInput?: (value?: string) => Promise<void> | void;
   onSelect?: (option?: Option | Option[]) => Promise<void> | void;
-  options?: Option[] | FetchOptions;
+  options?: Option[];
   placeholder?: string;
+  updateOptions?: (value?: string) => Promise<Option[]>;
   value?: string;
 }
 
 export default class TfStateManager extends Component<TfStateManagerArgs> {
+  @tracked private options: Option[] = this.args.options || [];
   @tracked private activeOption: Option | undefined;
-  @tracked private filteredOptions: Option[] = [];
   @tracked private hoveredOption: Option | undefined;
   @tracked private isFocused: boolean = false;
   @tracked private isLoading: boolean = false;
@@ -64,50 +63,31 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     return this.isValuePresent || !!this.selectedOption;
   }
 
-  async getOptions(): Promise<Option[]> {
-    if (this.args.options) {
-      if (Array.isArray(this.args.options)) {
-        return this.args.options;
-      } else {
-        try {
-          this.isLoading = true;
+  async fetchOptions(value?: string): Promise<Option[]> {
+    if (this.args.updateOptions) {
+      try {
+        this.isLoading = true;
 
-          return await this.args.options(this.args.value);
-        } catch (error) {
-          // console.warn(error);
-
-          return [];
-        } finally {
-          this.isLoading = false;
-        }
+        return await this.args.updateOptions(value);
+      } catch (error) {
+        return [];
+      } finally {
+        this.isLoading = false;
       }
     } else {
-      return [];
+      if (this.args.options) {
+        return this.args.options;
+      } else {
+        return [];
+      }
     }
   }
 
-  @action async fetchOptions(value?: string): Promise<Option[]> {
-    if (this.args.options) {
-      if (Array.isArray(this.args.options)) {
-        return this.args.options;
-      } else {
-        try {
-          this.isLoading = true;
+  async filterOptions(value?: string): Promise<Option[]> {
+    const filter = createFilter(value);
 
-          const options = await this.args.options(value);
-
-          this.isLoading = false;
-
-          return options;
-        } catch (error) {
-          // console.warn(error);
-
-          return [];
-        }
-      }
-    } else {
-      return [];
-    }
+    return (await this.fetchOptions(value))
+      .filter(option => filter(option) && !this.isSelected(option));
   }
 
   isSelected(option: Option): boolean {
@@ -123,15 +103,12 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
 
     if (isPresent(value)) {
       this.openMenu(false);
+    }
 
-      const filter = createFilter(value);
+    this.options = await this.filterOptions(value);
 
-      this.filteredOptions = (await this.fetchOptions(value))
-        .filter(option => filter(option) && !this.isSelected(option));
-
-      if (this.isMenuOpen) {
-        this.hoveredOption = this.filteredOptions[0];
-      }
+    if (this.isMenuOpen) {
+      this.hoveredOption = this.options[0];
     }
   }
 
@@ -199,7 +176,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     }
 
     if (!this.hoveredOption && setHoveredOption) {
-      this.hoveredOption = this.filteredOptions[0];
+      this.hoveredOption = this.options[0];
     } else {
       this.hoveredOption = undefined;
     }
@@ -213,25 +190,25 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     const min = 0;
 
     if (this.hoveredOption) {
-      let index = this.filteredOptions.findIndex(option => isEqual(option, this.hoveredOption)) + 1;
+      let index = this.options.findIndex(option => isEqual(option, this.hoveredOption)) + 1;
 
       // console.info('TfStateManager', 'nextMenuOption', index);
 
-      if (index >= this.filteredOptions.length) {
+      if (index >= this.options.length) {
         index = min;
       }
 
-      this.hoveredOption = this.filteredOptions[index];
+      this.hoveredOption = this.options[index];
     } else {
-      this.hoveredOption = this.filteredOptions[min];
+      this.hoveredOption = this.options[min];
     }
   }
 
   @action prevMenuOption() {
-    const max = this.filteredOptions.length - 1;
+    const max = this.options.length - 1;
 
     if (this.hoveredOption) {
-      let index = this.filteredOptions.findIndex(option => isEqual(option, this.hoveredOption)) - 1;
+      let index = this.options.findIndex(option => isEqual(option, this.hoveredOption)) - 1;
 
       // console.info('TfStateManager', 'prevMenuOption', index);
 
@@ -239,9 +216,9 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
         index = max;
       }
 
-      this.hoveredOption = this.filteredOptions[index];
+      this.hoveredOption = this.options[index];
     } else {
-      this.hoveredOption = this.filteredOptions[max];
+      this.hoveredOption = this.options[max];
     }
   }
 
@@ -278,12 +255,13 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @action popOption(): Option | undefined {
     const value = this.selectedOptions.pop();
 
+    this.selectedOption = undefined;
     this.selectedOptions = this.selectedOptions;
 
     this.onInput();
 
     if (this.args.onSelect) {
-      this.args.onSelect(this.selectedOptions);
+      this.args.onSelect(this.args.isMulti ? this.selectedOptions : this.selectedOption);
     }
 
     return value;
