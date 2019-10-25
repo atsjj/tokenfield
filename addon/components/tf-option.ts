@@ -33,21 +33,21 @@ export default class TfOption extends Component<TfOptionArgs> {
   }
 
   @action onMouseDown(event: MouseEvent) {
-    console.info('TfOption', 'onMouseDown', event);
+    // console.info('TfOption', 'onMouseDown', event);
     if (!this.args.isSelected && this.args.onActivateStart && this.args.value) {
       this.args.onActivateStart(this.args.value, event);
     }
   }
 
   @action onMouseOver(event: MouseEvent) {
-    console.info('TfOption', 'onMouseOver', event);
+    // console.info('TfOption', 'onMouseOver', event);
     if (!this.args.isSelected && this.args.onHoverStart && this.args.value) {
       this.args.onHoverStart(this.args.value, event);
     }
   }
 
   @action onMouseOut(event: MouseEvent) {
-    console.info('TfOption', 'onMouseOut', event);
+    // console.info('TfOption', 'onMouseOut', event);
     if (!this.args.isSelected && this.args.isActive && this.args.onActivateEnd && this.args.value) {
       this.args.onActivateEnd(this.args.value, event);
     }
@@ -58,7 +58,7 @@ export default class TfOption extends Component<TfOptionArgs> {
   }
 
   @action onClick(event: MouseEvent) {
-    console.info('TfOption', 'onClick', event);
+    // console.info('TfOption', 'onClick', event);
     if (!this.args.isSelected && this.args.onSelect && this.args.value) {
       this.args.onSelect(this.args.value, event);
     }

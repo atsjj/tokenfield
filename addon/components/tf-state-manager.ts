@@ -11,14 +11,15 @@ export interface Option {
 }
 
 export interface FetchOptions {
-  (value: string): Promise<Option[]>
+  (value?: string): Promise<Option[]>
 }
 
 interface TfStateManagerArgs {
   value?: string;
   placeholder?: string;
   options?: Option[] | FetchOptions;
-  onSelect: (option: Option | Option[]) => Promise<void> | void;
+  onInput?: (value?: string) => Promise<void> | void;
+  onSelect?: (option: Option | Option[]) => Promise<void> | void;
 }
 
 export default class TfStateManager extends Component<TfStateManagerArgs> {
@@ -38,7 +39,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   constructor(owner: unknown, args: TfStateManagerArgs) {
     super(owner, args);
 
-    this.filterOptions(this.args.value);
+    this.onInput(this.args.value);
   }
 
   get focused(): string {
@@ -50,33 +51,70 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   async getOptions(): Promise<Option[]> {
-    if (this.args.options && this.args.value) {
+    if (this.args.options) {
       if (Array.isArray(this.args.options)) {
         return this.args.options;
       } else {
-        this.isLoading = true;
+        try {
+          this.isLoading = true;
 
-        const options = await this.args.options(this.args.value);
+          return await this.args.options(this.args.value);
+        } catch (error) {
+          // console.warn(error);
 
-        this.isLoading = false;
-
-        return options;
+          return [];
+        } finally {
+          this.isLoading = false;
+        }
       }
     } else {
       return [];
     }
   }
 
-  @action async filterOptions(value?: string) {
-    // console.info('TfStateManager', 'filterOptions', ...arguments);
-    const filter = createFilter(value || '');
+  @action async fetchOptions(value?: string): Promise<Option[]> {
+    if (this.args.options) {
+      if (Array.isArray(this.args.options)) {
+        return this.args.options;
+      } else {
+        try {
+          this.isLoading = true;
 
-    this.args.value = value || '';
+          const options = await this.args.options(value);
 
-    this.filteredOptions = (await this.getOptions()).filter(option => {
-      return ((this.isValuePresent ? filter(option) : true) &&
-        !this.selectedOptions.some(selectedOption => isEqual(option, selectedOption)));
-    });
+          this.isLoading = false;
+
+          return options;
+        } catch (error) {
+          // console.warn(error);
+
+          return [];
+        }
+      }
+    } else {
+      return [];
+    }
+  }
+
+  isSelected(option: Option): boolean {
+    return this.selectedOptions.some(someOption => isEqual(option, someOption));
+  }
+
+  @action async onInput(value?: string) {
+    if (this.args.onInput) {
+      this.args.onInput(value);
+    }
+
+    if (value || isPresent(value)) {
+      this.openMenu(false);
+
+      const filter = createFilter(value);
+
+      this.filteredOptions = (await this.fetchOptions(value))
+        .filter(option => filter(option) && !this.isSelected(option));
+
+      this.openMenu();
+    }
   }
 
   @action activateOption(option: Option) {
@@ -106,8 +144,16 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
       if (this.isMulti) {
         this.selectedOptions.push(value);
         this.selectedOptions = this.selectedOptions;
+
+        if (this.args.onSelect) {
+          this.args.onSelect(this.selectedOptions);
+        }
       } else {
         this.selectedOption = value;
+
+        if (this.args.onSelect) {
+          this.args.onSelect(this.selectedOption);
+        }
       }
 
       this.closeMenu();
@@ -121,21 +167,23 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action clearValue() {
-    this.filterOptions();
+    this.onInput();
   }
 
   @action openMenu(setHoveredOption: boolean = true) {
     // console.info('TfStateManager', 'openMenu');
     if (!this.isMenuOpen) {
-      if (!this.hoveredOption && setHoveredOption) {
-        this.hoveredOption = this.filteredOptions[0];
-      }
-
-      if (!this.isFocused) {
-        this.isFocused = true;
-      }
-
       this.isMenuOpen = true
+    }
+
+    if (!this.hoveredOption && setHoveredOption) {
+      this.hoveredOption = this.filteredOptions[0];
+    } else {
+      this.hoveredOption = undefined;
+    }
+
+    if (!this.isFocused) {
+      this.isFocused = true;
     }
   }
 
@@ -179,7 +227,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     this.activeOption = undefined;
     this.hoveredOption = undefined;
     this.isMenuOpen = false;
-    // this.filterOptions();
+    // this.onInput();
 
     if (shouldBlur && this.containerElement) {
       if (document.activeElement && this.containerElement.contains(document.activeElement)) {
@@ -197,6 +245,10 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
 
     this.selectedOptions = this.selectedOptions
       .filter(selectedOption => !isEqual(selectedOption, option));
+
+    if (this.args.onSelect) {
+      this.args.onSelect(this.selectedOptions);
+    }
   }
 
   @action popOption(): Option | undefined {
@@ -204,17 +256,13 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
 
     this.selectedOptions = this.selectedOptions;
 
-    this.filterOptions();
+    this.onInput();
+
+    if (this.args.onSelect) {
+      this.args.onSelect(this.selectedOptions);
+    }
 
     return value;
-  }
-
-  @action pushOption(...value: Option[]) {
-    this.selectedOptions.push(...value);
-
-    this.selectedOptions = this.selectedOptions;
-
-    this.filterOptions();
   }
 
   /**
@@ -261,7 +309,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
         }
 
         this.selectOption();
-        this.args.value = '';
+        this.onInput();
         break;
       }
       case 'Escape': {
@@ -271,14 +319,14 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
       case 'Tab': {
         if (this.selectOption()) {
           event.preventDefault();
-          this.args.value = '';
+          this.onInput();
         }
         this.closeMenu();
         break;
       }
-      default: {
-        this.openMenu();
-      }
+      // default: {
+      //   this.openMenu();
+      // }
     }
   }
 

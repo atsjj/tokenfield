@@ -20,7 +20,7 @@ const defaultOptions = {
 }
 
 export function trimString(value: string, noop: boolean): string {
-  return noop ? value : value.replace(/^\s+|\s+$/g, '');
+  return !noop ? value : value.replace(/^\s+|\s+$/g, '');
 }
 
 export function isPresent(value?: string): boolean {
@@ -32,16 +32,16 @@ function toString({ label, value }: Option): string {
 }
 
 function toStripped(value: string, noop: boolean) {
-  return noop ? value : stripDiacritics(value);
+  return !noop ? value : stripDiacritics(value);
 }
 
 function toCased(value: string, noop: boolean) {
-  return noop ? value : value.toLowerCase();
+  return !noop ? value : value.toLowerCase();
 }
 
-export default function createFilter(input: string, options?: FilterOptions): Filter {
+export default function createFilter(input?: string, options?: FilterOptions): Filter {
   const { ignoreCase, ignoreAccents, stringify, trim, matchFrom } = { ...defaultOptions, ...options };
-  const needle = toStripped(toCased(trimString(input, trim), ignoreCase), ignoreAccents);
+  const needle = toStripped(toCased(trimString(input || '', trim), ignoreCase), ignoreAccents);
 
   return function filter(option: Option): boolean {
     const haystack = toStripped(toCased(trimString(stringify(option), trim),
