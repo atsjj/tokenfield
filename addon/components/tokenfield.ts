@@ -11,23 +11,33 @@ interface TokenfieldArgs {
   placeholder?: string;
   updateOptions?: (value?: string) => Promise<Option[]>;
   value?: string;
+  selectedOption?: Option;
+  selectedOptions?: Option[];
 }
 
 export default class Tokenfield extends Component<TokenfieldArgs> {
   @tracked private isMulti: boolean = !!this.args.isMulti;
   @tracked private options: Option[] = this.args.options || [];
   @tracked private placeholder: string = this.args.placeholder || 'Select...';
+  @tracked private selectedOption: Option | undefined = this.args.selectedOption;
+  @tracked private selectedOptions: Option[] = this.args.selectedOptions || [];
   @tracked private value: string = this.args.value || '';
 
   @action onInput(value?: string) {
+    this.value = value || '';
+
     if (this.args.onInput) {
       this.args.onInput(value);
-    } else {
-      this.value = value || '';
     }
   }
 
   @action onSelect(option?: Option | Option[]) {
+    if (this.isMulti) {
+      this.selectedOptions = option as Option[];
+    } else {
+      this.selectedOption = option as Option;
+    }
+
     if (this.args.onSelect) {
       this.args.onSelect(option);
     }

@@ -22,6 +22,8 @@ interface TfStateManagerArgs {
   placeholder?: string;
   updateOptions?: (value?: string) => Promise<Option[]>;
   value?: string;
+  selectedOption?: Option;
+  selectedOptions?: Option[];
 }
 
 export default class TfStateManager extends Component<TfStateManagerArgs> {
@@ -31,8 +33,8 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @tracked private isFocused: boolean = false;
   @tracked private isLoading: boolean = false;
   @tracked private isMenuOpen: boolean = false;
-  @tracked private selectedOption: Option | undefined;
-  @tracked private selectedOptions: Option[] = [];
+  @tracked private selectedOption: Option | undefined = this.args.selectedOption;
+  @tracked private selectedOptions: Option[] = this.args.selectedOptions || [];
 
   private containerElement: HTMLDivElement | undefined;
   private lastValueLength: number = (this.args.value || '').length;
