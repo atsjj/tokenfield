@@ -13,6 +13,7 @@ interface TokenfieldArgs {
   value?: string;
   selectedOption?: Option;
   selectedOptions?: Option[];
+  stringifyOption?: (option: Option) => string;
 }
 
 export default class Tokenfield extends Component<TokenfieldArgs> {
@@ -24,6 +25,7 @@ export default class Tokenfield extends Component<TokenfieldArgs> {
   @tracked private value: string = this.args.value || '';
   @tracked private labelKey: string = 'label';
   @tracked private valueKey: string = 'value';
+  @tracked private stringifyOption: ((option: Option) => string) | undefined = this.args.stringifyOption;
 
   @action onInput(value?: string) {
     this.value = value || '';

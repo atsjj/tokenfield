@@ -26,6 +26,7 @@ interface TfStateManagerArgs {
   selectedOptions?: Option[];
   labelKey?: string;
   valueKey?: string;
+  stringifyOption?: (option: Option) => string;
 }
 
 export default class TfStateManager extends Component<TfStateManagerArgs> {
@@ -39,6 +40,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @tracked private selectedOptions: Option[] = this.args.selectedOptions || [];
   @tracked private labelKey: string | undefined = this.args.labelKey;
   @tracked private valueKey: string | undefined = this.args.valueKey;
+  @tracked private stringifyOption: ((option: Option) => string) | undefined = this.args.stringifyOption;
 
   private containerElement: HTMLDivElement | undefined;
   private lastValueLength: number = (this.args.value || '').length;
@@ -90,7 +92,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   async filterOptions(value?: string): Promise<Option[]> {
-    const filter = createFilter(value);
+    const filter = (!!this.stringifyOption) ? createFilter(value, { stringify: this.stringifyOption }) : createFilter(value);
 
     return (await this.fetchOptions(value))
       .filter(option => filter(option) && !this.isSelected(option));
