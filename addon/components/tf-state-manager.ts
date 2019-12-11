@@ -3,6 +3,7 @@ import { isEqual } from '@ember/utils';
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
 import createFilter, { isPresent } from '../-private/filter';
+import NativeArray from '@ember/array/-private/native-array';
 
 export interface Option {
   value: string,
@@ -99,7 +100,11 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   isSelected(option: Option): boolean {
-    return this.selectedOptions.some(someOption => isEqual(option, someOption));
+    if (this.selectedOptions && this.selectedOptions['some']) {
+      return this.selectedOptions.some(someOption => isEqual(option, someOption));
+    } else {
+      return (this.selectedOptions as NativeArray<Option>).any(someOption => isEqual(option, someOption));
+    }
   }
 
   @action async onInput(value?: string) {
