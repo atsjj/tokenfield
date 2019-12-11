@@ -1,6 +1,6 @@
 {
   "name": "@atsjj/tokenfield",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description": "Based on React Select, a flexible and beautiful Select Input control for Ember with multiselect, autocomplete, async and creatable support.",
   "keywords": [
     "ember-addon"
