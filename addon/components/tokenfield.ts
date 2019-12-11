@@ -22,6 +22,8 @@ export default class Tokenfield extends Component<TokenfieldArgs> {
   @tracked private selectedOption: Option | undefined = this.args.selectedOption;
   @tracked private selectedOptions: Option[] = this.args.selectedOptions || [];
   @tracked private value: string = this.args.value || '';
+  @tracked private labelKey: string = 'label';
+  @tracked private valueKey: string = 'value';
 
   @action onInput(value?: string) {
     this.value = value || '';

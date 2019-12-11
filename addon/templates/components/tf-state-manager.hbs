@@ -7,8 +7,8 @@
                              @onMouseDown={{fn this.onInputMouseDown}}>
         {{#if @isMulti}}
           {{#each this.selectedOptions as |option|}}
-            <TfMultiValue @value={{option.value}}>
-              <TfMultiValueLabel>{{option.label}}</TfMultiValueLabel>
+            <TfMultiValue @value={{get option this.valueKey}}>
+              <TfMultiValueLabel>{{get option this.labelKey}}</TfMultiValueLabel>
               <TfMultiValueRemove @onClick={{fn this.removeOption option}}>
                 <TfCrossIcon @size={{14}} />
               </TfMultiValueRemove>
@@ -60,7 +60,7 @@
                         @onHoverStart={{fn this.hoverOption}}
                         @onHoverEnd={{fn this.dehoverOption}}
                         @onSelect={{fn this.selectOption}}>
-                {{option.label}}
+                {{get option this.labelKey}}
               </TfOption>
             {{else}}
               <TfOption @isDisabled={{true}}>No Options</TfOption>

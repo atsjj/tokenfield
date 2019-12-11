@@ -24,6 +24,8 @@ interface TfStateManagerArgs {
   value?: string;
   selectedOption?: Option;
   selectedOptions?: Option[];
+  labelKey?: string;
+  valueKey?: string;
 }
 
 export default class TfStateManager extends Component<TfStateManagerArgs> {
@@ -35,6 +37,8 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @tracked private isMenuOpen: boolean = false;
   @tracked private selectedOption: Option | undefined = this.args.selectedOption;
   @tracked private selectedOptions: Option[] = this.args.selectedOptions || [];
+  @tracked private labelKey: string | undefined = this.args.labelKey;
+  @tracked private valueKey: string | undefined = this.args.valueKey;
 
   private containerElement: HTMLDivElement | undefined;
   private lastValueLength: number = (this.args.value || '').length;
@@ -42,7 +46,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   constructor(owner: unknown, args: TfStateManagerArgs) {
     super(owner, args);
 
-    this.onInput(this.args.value);
+    // this.onInput(this.args.value);
   }
 
   get placeholder(): string {
