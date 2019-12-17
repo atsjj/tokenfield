@@ -150,17 +150,17 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
 
     if (value) {
       if (this.args.isMulti) {
-        this.selectedOptions.push(value);
-        this.selectedOptions = this.selectedOptions;
+        // this.selectedOptions.push(value);
+        // this.selectedOptions = this.selectedOptions;
 
         if (this.args.onSelect) {
-          this.args.onSelect(this.selectedOptions);
+          this.args.onSelect([...this.selectedOptions].concat([value]));
         }
       } else {
-        this.selectedOption = value;
+        // this.selectedOption = value;
 
         if (this.args.onSelect) {
-          this.args.onSelect(this.selectedOption);
+          this.args.onSelect(value);
         }
       }
     }
@@ -174,10 +174,10 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     if (this.isValuePresent) {
       this.onInput();
     } else if (shouldClearSelectedOption) {
-      this.selectedOption = undefined;
+      // this.selectedOption = undefined;
 
       if (this.args.onSelect) {
-        this.args.onSelect(this.selectedOption);
+        this.args.onSelect(undefined);
       }
     }
   }
@@ -257,24 +257,25 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @action removeOption(option: Option) {
     // console.info('TfStateManager', 'removeOption', option, event);
 
-    this.selectedOptions = this.selectedOptions
+    // this.selectedOptions = this.selectedOptions
+    //   .filter(selectedOption => !isEqual(selectedOption, option));
+
+    const selectedOptions = this.selectedOptions
       .filter(selectedOption => !isEqual(selectedOption, option));
 
     if (this.args.onSelect) {
-      this.args.onSelect(this.selectedOptions);
+      this.args.onSelect(selectedOptions);
     }
   }
 
   @action popOption(): Option | undefined {
-    const value = this.selectedOptions.pop();
-
-    this.selectedOption = undefined;
-    this.selectedOptions = this.selectedOptions;
+    const selectedOptions = [...this.selectedOptions];
+    const value = selectedOptions.pop();
 
     this.onInput();
 
     if (this.args.onSelect) {
-      this.args.onSelect(this.args.isMulti ? this.selectedOptions : this.selectedOption);
+      this.args.onSelect(this.args.isMulti ? selectedOptions : undefined);
     }
 
     return value;

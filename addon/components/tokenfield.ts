@@ -38,11 +38,11 @@ export default class Tokenfield extends Component<TokenfieldArgs> {
   }
 
   @action onSelect(option?: Option | Option[]) {
-    if (this.isMulti) {
-      this.selectedOptions = option as Option[];
-    } else {
-      this.selectedOption = option as Option;
-    }
+    // if (this.isMulti) {
+    //   this.selectedOptions = option as Option[];
+    // } else {
+    //   this.selectedOption = option as Option;
+    // }
 
     if (this.args.onSelect) {
       this.args.onSelect(option);
