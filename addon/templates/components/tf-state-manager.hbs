@@ -1,12 +1,13 @@
 <TfSelect>
   <TfSelectContainer @onInsert={{fn this.onInsert}}
-                     @onDestroy={{fn this.onDestroy}}>
+                     @onDestroy={{fn this.onDestroy}}
+                     ...attributes>
     <TfControl @isFocused={{this.focused}}>
       <TfMultiValueContainer @onClick={{fn this.openMenu}}
                              @onDblClick={{fn this.onInputDblClick}}
                              @onMouseDown={{fn this.onInputMouseDown}}>
         {{#if @isMulti}}
-          {{#each this.selectedOptions as |option|}}
+          {{#each @selectedOptions as |option|}}
             <TfMultiValue @value={{get option this.valueKey}}>
               <TfMultiValueLabel>{{get option this.labelKey}}</TfMultiValueLabel>
               <TfMultiValueRemove @onClick={{fn this.removeOption option}}>

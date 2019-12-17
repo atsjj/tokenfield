@@ -5,9 +5,9 @@
                 @options={{this.options}}
                 @placeholder={{this.placeholder}}
                 @value={{this.value}}
-                @selectedOption={{this.selectedOption}}
-                @selectedOptions={{this.selectedOptions}}
+                @selectedOption={{@selectedOption}}
+                @selectedOptions={{@selectedOptions}}
                 @labelKey={{this.labelKey}}
                 @valueKey={{this.valueKey}}
                 @stringifyOption={{this.stringifyOption}}
-                {{did-insert this.filterOptions}} />
+                ...attributes />

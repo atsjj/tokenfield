@@ -37,8 +37,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @tracked private isFocused: boolean = false;
   @tracked private isLoading: boolean = false;
   @tracked private isMenuOpen: boolean = false;
-  @tracked private selectedOption: Option | undefined = this.args.selectedOption;
-  @tracked private selectedOptions: Option[] = this.args.selectedOptions || [];
   @tracked private labelKey: string | undefined = this.args.labelKey;
   @tracked private valueKey: string | undefined = this.args.valueKey;
   @tracked private stringifyOption: ((option: Option) => string) | undefined = this.args.stringifyOption;
@@ -46,10 +44,12 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   private containerElement: HTMLDivElement | undefined;
   private lastValueLength: number = (this.args.value || '').length;
 
-  constructor(owner: unknown, args: TfStateManagerArgs) {
-    super(owner, args);
+  get selectedOption(): Option | undefined {
+    return this.args.selectedOption;
+  }
 
-    // this.onInput(this.args.value);
+  get selectedOptions(): Option[] {
+    return this.args.selectedOptions || [];
   }
 
   get placeholder(): string {
@@ -108,8 +108,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action async onInput(value?: string) {
-    // console.info('TfStateManager', 'onInput', value, event);
-
     if (this.args.onInput) {
       this.args.onInput(value);
     }
@@ -150,15 +148,10 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
 
     if (value) {
       if (this.args.isMulti) {
-        // this.selectedOptions.push(value);
-        // this.selectedOptions = this.selectedOptions;
-
         if (this.args.onSelect) {
-          this.args.onSelect([...this.selectedOptions].concat([value]));
+          this.args.onSelect(this.selectedOptions.concat([value]));
         }
       } else {
-        // this.selectedOption = value;
-
         if (this.args.onSelect) {
           this.args.onSelect(value);
         }
@@ -174,8 +167,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     if (this.isValuePresent) {
       this.onInput();
     } else if (shouldClearSelectedOption) {
-      // this.selectedOption = undefined;
-
       if (this.args.onSelect) {
         this.args.onSelect(undefined);
       }
@@ -183,7 +174,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action openMenu(setHoveredOption: boolean = true) {
-    // console.info('TfStateManager', 'openMenu');
     if (!this.isMenuOpen) {
       this.isMenuOpen = true
     }
@@ -205,8 +195,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     if (this.hoveredOption) {
       let index = this.options.findIndex(option => isEqual(option, this.hoveredOption)) + 1;
 
-      // console.info('TfStateManager', 'nextMenuOption', index);
-
       if (index >= this.options.length) {
         index = min;
       }
@@ -223,8 +211,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     if (this.hoveredOption) {
       let index = this.options.findIndex(option => isEqual(option, this.hoveredOption)) - 1;
 
-      // console.info('TfStateManager', 'prevMenuOption', index);
-
       if (index < 0) {
         index = max;
       }
@@ -236,30 +222,19 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action closeMenu(shouldBlur?: boolean) {
-    // console.info('TfStateManager', 'closeMenu');
-
     this.activeOption = undefined;
     this.hoveredOption = undefined;
     this.isMenuOpen = false;
-    // this.onInput();
 
     if (shouldBlur && this.containerElement) {
       if (document.activeElement && this.containerElement.contains(document.activeElement)) {
-        // console.info('TfStateManager', 'closeMenu', 'fully blur');
         (document.activeElement as HTMLElement).blur();
         this.isFocused = false;
-      } else {
-        // console.info('TfStateManager', 'closeMenu', 'partially blur');
       }
     }
   }
 
   @action removeOption(option: Option) {
-    // console.info('TfStateManager', 'removeOption', option, event);
-
-    // this.selectedOptions = this.selectedOptions
-    //   .filter(selectedOption => !isEqual(selectedOption, option));
-
     const selectedOptions = this.selectedOptions
       .filter(selectedOption => !isEqual(selectedOption, option));
 
@@ -269,7 +244,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action popOption(): Option | undefined {
-    const selectedOptions = [...this.selectedOptions];
+    const selectedOptions = Array.from(this.selectedOptions);
     const value = selectedOptions.pop();
 
     this.onInput();
@@ -300,7 +275,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
         if (this.isMenuOpen) {
           this.nextMenuOption();
         } else {
-          // console.info('TfStateManager', 'handleAccelerator', 'ArrowDown', 'openMenu');
           this.openMenu(true);
         }
 
@@ -310,7 +284,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
         if (this.isMenuOpen) {
           this.prevMenuOption();
         } else {
-          // console.info('TfStateManager', 'handleAccelerator', 'ArrowUp', 'openMenu');
           this.openMenu(true);
         }
 
@@ -334,7 +307,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
         break;
       }
       case 'Escape': {
-        // console.info('TfStateManager', 'handleAccelerator', 'Escape', 'closeMenu');
         this.closeMenu();
 
         break;
@@ -345,13 +317,12 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
         }
 
         this.clearValue();
-        // console.info('TfStateManager', 'handleAccelerator', 'Tab', 'closeMenu');
         this.closeMenu();
 
         break;
       }
       default: {
-        // this.openMenu();
+
       }
     }
   }
@@ -360,8 +331,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
    * Blur Event Handler for Input
    */
   @action onInputBlur() {
-    // console.info('TfStateManager', 'onInputBlur', ...arguments);
-
     if (this.containerElement) {
       if (!document.activeElement && this.containerElement.contains(document.activeElement)) {
         this.closeMenu(true);
@@ -400,19 +369,16 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action onOptionClick(_: MouseEvent, option: Option) {
-    // console.info('TfStateManager', 'onOptionClick', ...arguments);
     this.selectOption(option);
   }
 
   @action onOptionMouseOut(_: MouseEvent, option: Option) {
-    // console.info('TfStateManager', 'onOptionMouseOut', ...arguments);
     if (isEqual(this.hoveredOption, option)) {
       this.hoveredOption = undefined;
     }
   }
 
   @action onOptionMouseOver(_: MouseEvent, option: Option) {
-    // console.info('TfStateManager', 'onOptionMouseOver', ...arguments);
     this.hoveredOption = option;
   }
 
@@ -427,16 +393,12 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action onInsert(element: HTMLDivElement) {
-    // console.info('TfStateManager', 'onInsert', ...arguments);
-
     this.containerElement = element;
 
     document.addEventListener('click', this.onBlur.bind(this));
   }
 
   @action onDestroy() {
-    // console.info('TfStateManager', 'onDestroy', ...arguments);
-
     this.containerElement = undefined;
 
     document.removeEventListener('click', this.onBlur.bind(this));
