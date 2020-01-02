@@ -1,1 +1,1 @@
-export { default } from '@atsjj/tokenfield/templates/components/tf-menu-list';
+export { default } from '@summit-electric-supply/tokenfield/templates/components/tf-menu-list';

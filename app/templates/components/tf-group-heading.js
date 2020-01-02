@@ -1,1 +1,1 @@
-export { default } from '@atsjj/tokenfield/templates/components/tf-group-heading';
+export { default } from '@summit-electric-supply/tokenfield/templates/components/tf-group-heading';

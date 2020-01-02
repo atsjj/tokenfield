@@ -1,5 +1,7 @@
 import { action } from '@ember/object';
 import { isEqual } from '@ember/utils';
+import { cancel, later } from '@ember/runloop';
+import { EmberRunTimer } from "@ember/runloop/types";
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
 import createFilter, { isPresent } from '../-private/filter';
@@ -41,6 +43,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @tracked private valueKey: string | undefined = this.args.valueKey;
   @tracked private stringifyOption: ((option: Option) => string) | undefined = this.args.stringifyOption;
 
+  private nextRun: EmberRunTimer | undefined;
   private containerElement: HTMLDivElement | undefined;
   private lastValueLength: number = (this.args.value || '').length;
 
@@ -146,6 +149,10 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @action selectOption(option?: Option): boolean {
     const value = option || this.hoveredOption;
 
+    if (this.nextRun) {
+      cancel(this.nextRun);
+    }
+
     if (value) {
       if (this.args.isMulti) {
         if (this.args.onSelect) {
@@ -158,6 +165,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
       }
     }
 
+    this.clearValue();
     this.closeMenu();
 
     return !!value;
@@ -301,6 +309,8 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
           break;
         }
 
+        event.preventDefault();
+
         this.selectOption();
         this.clearValue();
 
@@ -383,13 +393,15 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action onBlur(_: FocusEvent) {
-    const el = this.containerElement;
-    const activeEl = document.activeElement;
+    this.nextRun = later(() => {
+      const el = this.containerElement;
+      const activeEl = document.activeElement;
 
-    if (!el || !activeEl || (el && !el.contains(activeEl) && !isEqual(el, activeEl))) {
-      this.isFocused = false;
-      this.closeMenu();
-    }
+      if (!el || !activeEl || (el && !el.contains(activeEl) && !isEqual(el, activeEl))) {
+        this.isFocused = false;
+        this.closeMenu();
+      }
+    }, 500);
   }
 
   @action onInsert(element: HTMLDivElement) {

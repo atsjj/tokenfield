@@ -1,1 +1,1 @@
-export { default } from '@atsjj/tokenfield/templates/components/autosize-input';
+export { default } from '@summit-electric-supply/tokenfield/templates/components/autosize-input';

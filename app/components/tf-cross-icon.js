@@ -1,1 +1,1 @@
-export { default } from '@atsjj/tokenfield/components/tf-cross-icon';
+export { default } from '@summit-electric-supply/tokenfield/components/tf-cross-icon';

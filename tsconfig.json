@@ -29,16 +29,16 @@
         "tests/dummy/app/*",
         "app/*"
       ],
-      "@atsjj/tokenfield": [
+      "@summit-electric-supply/tokenfield": [
         "addon"
       ],
-      "@atsjj/tokenfield/*": [
+      "@summit-electric-supply/tokenfield/*": [
         "addon/*"
       ],
-      "@atsjj/tokenfield/test-support": [
+      "@summit-electric-supply/tokenfield/test-support": [
         "addon-test-support"
       ],
-      "@atsjj/tokenfield/test-support/*": [
+      "@summit-electric-supply/tokenfield/test-support/*": [
         "addon-test-support/*"
       ],
       "*": [

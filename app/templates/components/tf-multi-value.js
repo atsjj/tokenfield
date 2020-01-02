@@ -1,1 +1,1 @@
-export { default } from '@atsjj/tokenfield/templates/components/tf-multi-value';
+export { default } from '@summit-electric-supply/tokenfield/templates/components/tf-multi-value';

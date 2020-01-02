@@ -1,1 +1,1 @@
-export { default } from '@atsjj/tokenfield/templates/components/tf-loading-message';
+export { default } from '@summit-electric-supply/tokenfield/templates/components/tf-loading-message';

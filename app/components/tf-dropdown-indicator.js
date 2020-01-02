@@ -1,1 +1,1 @@
-export { default } from '@atsjj/tokenfield/components/tf-dropdown-indicator';
+export { default } from '@summit-electric-supply/tokenfield/components/tf-dropdown-indicator';

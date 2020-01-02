@@ -1,1 +1,1 @@
-export { default, join } from '@atsjj/tokenfield/helpers/join';
+export { default, join } from '@summit-electric-supply/tokenfield/helpers/join';
