@@ -1,7 +1,7 @@
-import { Option, FetchOptions } from './tf-state-manager';
+import { action } from '@ember/object';
+import { Option } from './tf-state-manager';
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 interface TokenfieldArgs {
   isMulti?: boolean;
@@ -49,5 +49,18 @@ export default class Tokenfield extends Component<TokenfieldArgs> {
     } else {
       return this.options;
     }
+  }
+
+  _() {
+    console.info(
+      this.isMulti,
+      this.placeholder,
+      this.selectedOption,
+      this.selectedOptions,
+      this.value,
+      this.labelKey,
+      this.valueKey,
+      this.stringifyOption
+    )
   }
 }

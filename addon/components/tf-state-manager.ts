@@ -1,7 +1,7 @@
 import { action } from '@ember/object';
-import { isEqual } from '@ember/utils';
 import { cancel, later } from '@ember/runloop';
 import { EmberRunTimer } from "@ember/runloop/types";
+import { isEqual } from '@ember/utils';
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
 import createFilter, { isPresent } from '../-private/filter';
@@ -414,5 +414,13 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     this.containerElement = undefined;
 
     document.removeEventListener('click', this.onBlur.bind(this));
+  }
+
+  _() {
+    console.info(
+      this.isLoading,
+      this.labelKey,
+      this.valueKey
+    )
   }
 }
