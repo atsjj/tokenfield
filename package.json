@@ -8,7 +8,6 @@
   "repository": "",
   "license": "MIT",
   "author": "Steve Jabour <steve@jabour.me> (https://github.com/atsjj)",
-  "private": true,
   "directories": {
     "doc": "doc",
     "test": "tests"
