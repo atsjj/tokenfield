@@ -1,6 +1,4 @@
 import { action } from '@ember/object';
-import { cancel, later } from '@ember/runloop';
-import { EmberRunTimer } from "@ember/runloop/types";
 import { isEqual } from '@ember/utils';
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
@@ -43,7 +41,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @tracked private valueKey: string | undefined = this.args.valueKey;
   @tracked private stringifyOption: ((option: Option) => string) | undefined = this.args.stringifyOption;
 
-  private nextRun: EmberRunTimer | undefined;
   private containerElement: HTMLDivElement | undefined;
   private lastValueLength: number = (this.args.value || '').length;
 
@@ -149,10 +146,6 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   @action selectOption(option?: Option): boolean {
     const value = option || this.hoveredOption;
 
-    if (this.nextRun) {
-      cancel(this.nextRun);
-    }
-
     if (value) {
       if (this.args.isMulti) {
         if (this.args.onSelect) {
@@ -242,7 +235,9 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
     }
   }
 
-  @action removeOption(option: Option) {
+  @action removeOption(option: Option, event: MouseEvent) {
+    event.stopPropagation();
+
     const selectedOptions = this.selectedOptions
       .filter(selectedOption => !isEqual(selectedOption, option));
 
@@ -393,15 +388,13 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
   }
 
   @action onBlur(_: FocusEvent) {
-    this.nextRun = later(() => {
-      const el = this.containerElement;
-      const activeEl = document.activeElement;
+    const el = this.containerElement;
+    const activeEl = document.activeElement;
 
-      if (!el || !activeEl || (el && !el.contains(activeEl) && !isEqual(el, activeEl))) {
-        this.isFocused = false;
-        this.closeMenu();
-      }
-    }, 500);
+    if (!el || !activeEl || (el && !el.contains(activeEl) && !isEqual(el, activeEl))) {
+      this.isFocused = false;
+      this.closeMenu();
+    }
   }
 
   @action onInsert(element: HTMLDivElement) {

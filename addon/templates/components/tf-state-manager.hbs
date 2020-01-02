@@ -17,8 +17,7 @@
           {{/each}}
         {{/if}}
         <TfInput>
-          <AutosizeInput @onBlur={{fn this.onBlur}}
-                         @onClick={{fn this.openMenu}}
+          <AutosizeInput @onClick={{fn this.openMenu}}
                          @onFocus={{fn this.focus}}
                          @onInput={{fn this.onInput}}
                          @onKeyDown={{fn this.handleAccelerator}}
