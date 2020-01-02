@@ -1,6 +1,6 @@
 {
   "name": "@summit-electric-supply/tokenfield",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "Based on React Select, a flexible and beautiful Select Input control for Ember with multiselect, autocomplete, async and creatable support.",
   "keywords": [
     "ember-addon"
