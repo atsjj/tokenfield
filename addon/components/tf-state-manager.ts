@@ -317,12 +317,14 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
         break;
       }
       case 'Tab': {
-        if (this.selectOption()) {
+        const hasOption = this.selectOption();
+
+        if (hasOption) {
           event.preventDefault();
         }
 
         this.clearValue();
-        this.closeMenu();
+        this.closeMenu(!hasOption);
 
         break;
       }
