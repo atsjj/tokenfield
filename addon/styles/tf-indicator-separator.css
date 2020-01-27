@@ -1,12 +1,16 @@
 .tf-indicator-separator {
   align-self: stretch;
-  background-color: var(--neutral-20);
+  /* background-color: var(--neutral-20); */
+  background-color: hsl(0, 0%, 80%);
   box-sizing: border-box;
-  margin-bottom: calc(var(--base-unit) * 2);
-  margin-top: calc(var(--base-unit) * 2);
+  /* margin-bottom: calc(var(--base-unit) * 2); */
+  margin-bottom: 8px;
+  /* margin-top: calc(var(--base-unit) * 2); */
+  margin-top: 8px;
   width: 1px;
 }
 
 .tf-indicator-separator-disabled {
-  background-color: var(--neutral-10);
+  /* background-color: var(--neutral-10); */
+  background-color: hsl(0, 0%, 90%);
 }

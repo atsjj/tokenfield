@@ -2,17 +2,23 @@
   -webkit-box-align: center;
   align-items: center;
   display: flex;
-  padding-left: var(--base-unit);
-  padding-right: var(--base-unit);
+  /* padding-left: var(--base-unit); */
+  padding-left: 4px;
+  /* padding-right: var(--base-unit); */
+  padding-right: 4px;
   box-sizing: border-box;
-  border-radius: calc(var(--border-radius) / 2);
+  /* border-radius: calc(var(--border-radius) / 2); */
+  border-radius: 2px;
 }
 
 .tf-multi-value-remove:active {
-  background-color: var(--danger-light);
+  /* background-color: var(--danger-light); */
+  background-color: #FFBDAD;
 }
 
 .tf-multi-value-remove:hover:not(:active) {
-  background-color: var(--danger-light);
-  color: var(--danger);
+  /* background-color: var(--danger-light); */
+  background-color: #FFBDAD;
+  /* color: var(--danger); */
+  color: #DE350B;
 }

@@ -6,6 +6,7 @@
   position: relative;
   box-sizing: border-box;
   flex: 1 1 0%;
-  padding: calc(var(--base-unit) / 2) calc(var(--base-unit) * 2);
+  /* padding: calc(var(--base-unit) / 2) calc(var(--base-unit) * 2); */
+  padding: 2px 2px;
   overflow: hidden;
 }

@@ -1,19 +1,24 @@
 .tf-indicator {
   box-sizing: border-box;
-  color: var(--neutral-20);
+  /* color: var(--neutral-20); */
+  color: hsl(0, 0%, 80%);
   display: flex;
-  padding: calc(var(--base-unit) * 2);
+  /* padding: calc(var(--base-unit) * 2); */
+  padding: 8px;
   transition: color 150ms ease 0s;
 }
 
 .tf-indicator:focus {
-  color: var(--neutral-60);
+  /* color: var(--neutral-60); */
+  color: hsl(0, 0%, 40%);
 }
 
 .tf-indicator:hover {
-  color: var(--neutral-40);
+  /* color: var(--neutral-40); */
+  color: hsl(0, 0%, 60%);
 }
 
 .tf-indicator:focus:hover {
-  color: var(--neutral-80);
+  /* color: var(--neutral-80); */
+  color: hsl(0, 0%, 20%);
 }

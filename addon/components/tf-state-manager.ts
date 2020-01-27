@@ -294,6 +294,7 @@ export default class TfStateManager extends Component<TfStateManagerArgs> {
       }
       case 'Backspace': {
         if (this.lastValueLength <= 0) {
+          event.preventDefault();
           this.popOption();
         }
 
